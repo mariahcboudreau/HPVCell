@@ -38,7 +38,7 @@ def cell_division(event_queue, skin, cell, beta, gamma, rho, delta, theta, t):
     return event_queue
 
 # Number of simulations to run
-num_sims = 100
+num_sims = 1000
 all_history = []
 all_basal_history = []
 all_parabasal_history = []
@@ -48,16 +48,16 @@ all_sheds = []
 # Parameters of the model
 symm_div = 0.04
 asymm_div = 1 - 2*symm_div # Asymmetric divisions are more probable, 84% chance
-shed = 2.0*(0.0082)*1.99 # similar to division but just a little bit different according to the plos epithelial strat paper
+shed = 2.0*(0.0082) # similar to division but just a little bit different according to the plos epithelial strat paper
 
 rho = symm_div
 gamma = asymm_div
 delta = symm_div
 beta = symm_div
 theta = shed
-basal_prop =  0.2 # TODO: Confirm proportion of basal cells
+basal_prop =  0.2 # TODO: Confirm proportion of basal cells 10^3 from plos epithelial
 parabasal_prop = 1 - basal_prop
-skin_size = 1000
+skin_size = 100000 #
 shed_amount = 100
 
 # Simulation
@@ -146,23 +146,57 @@ for s in range(num_sims):
 
 
 
-fig, axs = plt.subplots(1)
+fig, axs = plt.subplots(3)
 #
 for i in range(num_sims-1):
 
-    axs.plot(all_times[i], all_sheds[i], marker = "o", ls = '--', color = 'black', alpha = 0.25, rasterized=True)
-    axs.set_ylabel('Virons shed')
-    axs.set_xlabel('Time')
-#     axs[0].plot(all_times[i], all_history[i], marker = "o", ls = '--', color = 'black', alpha = 0.25, label = 'Simulation')
-#
-#     axs[1].plot(all_times[i], all_basal_history[i], marker = "o", ls = '--', color = 'black', alpha = 0.25, label = 'Simulation')
-#
-#     axs[2].plot(all_times[i], all_parabasal_history[i], marker = "o", ls = '--', color = 'black', alpha = 0.25, label = 'Simulation')
-#
-#
-# axs[0].set_ylabel('Infected Cells')
-# axs[1].set_ylabel('Infected Basal Cells')
-# axs[2].set_ylabel('Infected Parabasal Cells')
-# axs[2].set_xlabel('Time')
-#plt.show()
-plt.savefig("~/Documents/MOCS2/testCode/HPVCellSim/shedding_simulation.pdf", format = 'pdf')
+    # axs.plot(all_times[i], all_sheds[i], marker = "o", ls = '--', color = 'black', alpha = 0.25, rasterized=True)
+    # axs.set_ylabel('Virons shed')
+    # axs.set_xlabel('Time')
+    axs[0].plot(all_times[i], all_history[i], marker = "o", ls = '--', color = 'black', alpha = 0.25, label = 'Simulation', rasterized=True)
+
+    axs[1].plot(all_times[i], all_basal_history[i], marker = "o", ls = '--', color = 'black', alpha = 0.25, label = 'Simulation', rasterized=True)
+
+    axs[2].plot(all_times[i], all_parabasal_history[i], marker = "o", ls = '--', color = 'black', alpha = 0.25, label = 'Simulation', rasterized=True)
+
+
+axs[0].set_ylabel('Infected Cells')
+axs[1].set_ylabel('Infected Basal Cells')
+axs[2].set_ylabel('Infected Parabasal Cells')
+axs[2].set_xlabel('Time')
+plt.show()
+# plt.savefig("~/Documents/MOCS2/testCode/HPVCellSim/shedding_simulation.pdf", format = 'pdf')
+
+
+### 3D PLOTTING OF THE SIMS, ONLY A FEW SETS OF THEM
+import matplotlib.ticker as ticker
+
+ax = plt.figure().add_subplot(projection='3d')
+majors = []
+
+
+for sim in range(0,num_sims,100):
+    ax.plot(all_times[sim], all_basal_history[sim], sim,  marker = "o", ls = '--', label = 'Simulation', rasterized=True)
+    majors.append(sim)
+   
+ax.view_init(elev=51, azim=39, roll=120) # Elevation is bottom spin, Azimth is twist R-L 
+ax.set_xlabel('Time')
+ax.set_ylabel('Proportion of infected basal cells')
+ax.set_zlabel('Simulation')
+ax.zaxis.set_major_locator(ticker.FixedLocator(majors))
+plt.show()
+
+ax = plt.figure().add_subplot(projection='3d')
+majors = []
+
+
+for sim in range(0,num_sims,100):
+    ax.plot(all_times[sim], all_parabasal_history[sim], sim,  marker = "o", ls = '--',  label = 'Simulation', rasterized=True)
+    majors.append(sim)
+   
+ax.view_init(elev=51, azim=39, roll=120) # Elevation is bottom spin, Azimth is twist R-L 
+ax.set_xlabel('Time')
+ax.set_ylabel('Proportion of infected parabasal cells')
+ax.set_zlabel('Simulation')
+ax.zaxis.set_major_locator(ticker.FixedLocator(majors))
+plt.show()
