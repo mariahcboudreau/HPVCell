@@ -367,21 +367,26 @@ for t, j in zip(snapshots, range(len(snapshots))):
     std = np.sqrt(m_path[t][2]-m_path[t][0]**2)
 
     axs[1].plot(t, m_path[t][0]/skin_size, marker = "*", color = 'red')
-    axs[1].plot(t, m_path[t][0]/skin_size + 2*std, marker = "_", color = "red")
-    axs[1].plot(t, avg_basals[j], marker = 'x', color = "yellow")
+    markers1, = axs[1].plot(t, m_path[t][0]/skin_size + 2*std, marker = "_", color = "red")
+    markers2, = axs[1].plot(t, avg_basals[j], marker = 'x', color = "yellow")
+    if t == snapshots[0]:
+        markers1.set_label("Method of moments")
+        markers2.set_label("Average of simulations")
     # axs[1].plot(t, m_path[t][0]/skin_size - 2 * std, marker="_", color="red")
 
 axs[0].set_ylabel('Infected Cells')
 axs[1].set_ylabel('Infected Basal Cells')
 axs[2].set_ylabel('Infected Parabasal Cells')
 axs[2].set_xlabel('Time')
-axs[1].set_ylim([0,0.01])
-axs[2].set_ylim([0,0.2])
+axs[1].set_ylim([0,0.005])
+axs[2].set_ylim([0,0.1])
+axs[1].legend()
 
-plt.legend()
-plt.show()
-# plt.close()
-# plt.savefig("sims_compare_mom.pdf", format = "pdf")
+
+# plt.show()
+
+plt.savefig("sims_compare_mom.pdf", format = "pdf")
+plt.close()
 # print("done")
 
 ### 3D PLOTTING OF THE SIMS, ONLY A FEW SETS OF THEM

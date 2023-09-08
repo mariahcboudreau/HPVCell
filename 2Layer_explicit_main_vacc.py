@@ -89,13 +89,13 @@ t_vec = np.linspace(0, t_length, t_steps)
 
 # Initial conditions
 
-nb_of_states_b = 100
-nb_of_states_p = 200
+nb_of_states_b = 150
+nb_of_states_p = nb_of_states_b * 2
 x_0 = np.zeros((nb_of_states_b, nb_of_states_p))
 x_0[1,0] = 1
 m_0 = np.zeros(5)
 m_0[0] = 1
-m_0[2] = 0
+m_0[2] = 1
 
 # Parameters of the model
 symm_div = 0.04
@@ -124,8 +124,8 @@ sys.stdout.flush()
 with open('/gpfs1/home/m/c/mcboudre/scratch/hpv_modeling/x_path_file_2layer_main.npy', 'wb') as handle:
     np.save(handle, x_path)
 print('almost done pickling')
-with open('/gpfs1/home/m/c/mcboudre/scratch/hpv_modeling/m_path_2layer_main.npy', 'wb') as handle:    
-    np.save(handle, m_path)
+# with open('/gpfs1/home/m/c/mcboudre/scratch/hpv_modeling/m_path_2layer_main.npy', 'wb') as handle:    
+#     np.save(handle, m_path)
 
 print('done')
 sys.stdout.flush()

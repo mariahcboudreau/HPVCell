@@ -147,7 +147,7 @@ rho = symm_div
 gamma = asymm_div
 delta = symm_div
 beta = symm_div
-theta = 0.01 # plost epithelial chart
+theta = 0.01 # plos epithelial chart
 alpha = diff
 sigma = 0.18 # plos epithelial chart 
 

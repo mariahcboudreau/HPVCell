@@ -129,16 +129,17 @@ t_vec = np.linspace(0, t_length, t_steps)
 # Initial conditions
 print('initial conditions')
 sys.stdout.flush()
-prop = 0.2
+prop = 0.3
 
 nb_of_states_b = int(100*prop)
 nb_of_states_p = int(500*prop)
-nb_of_states_i = int(200*prop)
-nb_of_states_s = int(200*prop)
+nb_of_states_i = int(50*prop)
+nb_of_states_s = int(50*prop)
 x_0 = np.zeros((nb_of_states_b, nb_of_states_p, nb_of_states_i, nb_of_states_s))
 x_0[1,0,0,0] = 1
 m_0 = np.zeros(14)
 m_0[0] = 1
+m_0[4] = 1
 
 print("parameters")
 sys.stdout.flush()
@@ -172,8 +173,8 @@ sys.stdout.flush()
 with open('/gpfs1/home/m/c/mcboudre/scratch/hpv_modeling/x_path_file_4layer_main.npy', 'wb') as handle:
     np.save(handle, x_path)
 print('almost done saving')
-with open('/gpfs1/home/m/c/mcboudre/scratch/hpv_modeling/m_path_4layer_main.npy', 'wb') as handle:    
-    np.save(handle, m_path)
+# with open('/gpfs1/home/m/c/mcboudre/scratch/hpv_modeling/m_path_4layer_main.npy', 'wb') as handle:    
+#     np.save(handle, m_path)
 
 print('done')
 sys.stdout.flush()
