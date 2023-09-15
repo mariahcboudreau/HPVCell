@@ -146,7 +146,7 @@ diff = 2.0*(0.0082)# similar to division but just a little bit different accordi
 rho = symm_div
 gamma = asymm_div
 delta = symm_div
-beta = symm_div
+beta = symm_div - 0.01
 theta = 0.01 # plos epithelial chart
 alpha = diff
 sigma = 0.18 # plos epithelial chart 
@@ -180,7 +180,7 @@ y_vals = []
 z_vals = []
 stddev = np.sqrt(m_path[-1][4]-m_path[-1][0]**2)
 for t in range(0,t_length-1,100):
-    ax.plot(range(nb_of_states_b), np.sum(np.sum(np.sum(x_path[t], axis = 0), axis = 1), axis = 1), t, marker="o", ls='--')
+    ax.plot(range(nb_of_states_b), np.sum(np.sum(np.sum(x_path[t], axis = 1), axis = 1), axis = 1), t, marker="o", ls='--')
     majors.append(t)
     m_path_vals.append(m_path[t][0])
     y_vals.append(0)
@@ -189,7 +189,7 @@ ax.stem(m_path_vals, y_vals, z_vals, linefmt='black', markerfmt = 'black', label
 ax.stem(m_path_vals+stddev, y_vals, z_vals, linefmt='gray', markerfmt = 'gray',  label='Standard deviation')
 ax.view_init(elev=51, azim=39, roll=120) # Elevation is bottom spin, Azimth is twist R-L 
 ax.set_ylabel('Probabtility')
-ax.set_xlabel('Number of infected parabasal cells')
+ax.set_xlabel('Number of infected basal cells')
 ax.set_zlabel('Time')
 ax.zaxis.set_major_locator(ticker.FixedLocator(majors))
 plt.show()

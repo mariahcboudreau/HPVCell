@@ -66,7 +66,7 @@ def MOM(m, t, beta, gamma, delta, rho, alpha, sigma, theta): #figure out the rig
 
 # Time of observations
 t_length = 500
-t_steps = 500
+t_steps = 50
 t_vec = np.linspace(0, t_length, t_steps)
 
 # Initial conditions
@@ -84,7 +84,7 @@ diff = 2.0*(0.0082)# similar to division but just a little bit different accordi
 rho = symm_div
 gamma = asymm_div
 delta = symm_div
-beta = symm_div
+beta = symm_div - 0.01
 theta = 0.01 # plost epithelial chart
 alpha = diff
 sigma = 0.18 # plos epithelial chart 

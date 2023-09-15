@@ -2,6 +2,7 @@
 # HPVCellSim Master Equations VACC
 
 import numpy as np
+import scipy.stats 
 import matplotlib.pyplot as plt
 from numba import jit
 import sys
@@ -81,21 +82,34 @@ def MOM(m, t, beta, gamma, delta, rho, theta): #figure out the right way to do t
     dx[4] = beta * m[4] - theta * m[4] + rho * m[4] + gamma * m[2] - delta * m[4] + 2 * delta * m[2] - 2 * delta * m[0]
     return dx
 
+#  Time declaration
 
-# Time of observations
-t_length = 500
-t_steps = 500
-t_vec = np.linspace(0, t_length, t_steps)
+time_total = 500
 
 # Initial conditions
-
-nb_of_states_b = 150
+nb_of_states_b = 300
 nb_of_states_p = nb_of_states_b * 2
-x_0 = np.zeros((nb_of_states_b, nb_of_states_p))
-x_0[1,0] = 1
-m_0 = np.zeros(5)
-m_0[0] = 1
-m_0[2] = 1
+
+x_0_delta = np.zeros((nb_of_states_b, nb_of_states_p))
+x_0_poisson = np.zeros((nb_of_states_b, nb_of_states_p))
+x_0_delta[1,0] = 1 # This is a delta approximation for the initial conditions x_0[1,0] = 1
+
+for i in range(len(x_0_poisson)):
+    x_0_poisson[i,0] = scipy.stats.poisson.pmf(k = i, mu = 1)
+
+m_0_delta = np.zeros(5)
+m_0_poisson = np.zeros(5)
+
+m_0_delta[0] = 1
+m_0_delta[2] = 1 
+
+m_0_poisson[0] = 1
+m_0_poisson[2] = 2
+
+cumu_extinct_delta = np.zeros((time_total))
+cumu_extinct_poisson = np.zeros((time_total))
+extinct_mom_b_delta = np.zeros((time_total))
+extinct_mom_b_poisson = np.zeros((time_total))
 
 # Parameters of the model
 symm_div = 0.04
@@ -105,27 +119,70 @@ shed = 2.0*(0.0082)*1.99 # similar to division but just a little bit different a
 rho = symm_div
 gamma = asymm_div
 delta = symm_div
-beta = symm_div
+beta = symm_div - 0.01
 theta = shed
 
+#######
+###
+### Time for loop
+###
+######
+
+for t in range(time_total):
+
+    if t == 0:
+        x_delta = x_0_delta
+        x_poisson = x_0_poisson
+        m_delta = m_0_delta
+        m_poisson = m_0_poisson
+    else:
+        x_delta = x_path_delta
+        x_poisson = x_path_poisson
+        m_delta = m_path_delta
+        m_poisson = m_path_poisson
+
+    t_point = [t]
+
+    # Integration
+    G = lambda x, t: J(x, t, beta, gamma, delta, rho, theta)
+    x_path_delta = odeintw(G, x_delta, t_point)
+    G = lambda x, t: J(x, t, beta, gamma, delta, rho, theta)
+    x_path_poisson = odeintw(G, x_poisson, t_point)
+    M = lambda m, t: MOM(m, t, beta, gamma, delta, rho, theta)
+    m_path_delta = odeintw(M, m_delta, t_point)
+    M = lambda m, t: MOM(m, t, beta, gamma, delta, rho, theta)
+    m_path_poisson = odeintw(M, m_poisson, t_point)
+
+    ####
+    ## Solving for extinction probabilities 
+    ####
+
+    # Explicit ME
+
+    cumu_extinct_delta[t] = np.sum(x_path_delta[0][:])
+    cumu_extinct_poisson[t] = np.sum(x_path_poisson[0][:])
+
+    # MOM
+
+    extinct_mom_b_delta[t] = (1-((m_path_delta[0]**2)/(m_path_delta[2])))
+    extinct_mom_b_poisson[t] = 1 - (m_path_poisson[0]**2)/(m_path_poisson[2] - m_path_poisson[0]) 
 
 
-# Integration
-G = lambda x, t: J(x, t, beta, gamma, delta, rho, theta)
-x_path = odeintw(G, x_0, t_vec)
-M = lambda m, t: MOM(m, t, beta, gamma, delta, rho, theta)
-m_path = odeintw(M, m_0, t_vec)
 
 
 
 
-print('saving')
-sys.stdout.flush()
-with open('/gpfs1/home/m/c/mcboudre/scratch/hpv_modeling/x_path_file_2layer_main.npy', 'wb') as handle:
-    np.save(handle, x_path)
-print('almost done pickling')
-# with open('/gpfs1/home/m/c/mcboudre/scratch/hpv_modeling/m_path_2layer_main.npy', 'wb') as handle:    
-#     np.save(handle, m_path)
+    print('saving')
+    sys.stdout.flush()
+    with open('/gpfs1/home/m/c/mcboudre/scratch/hpv_modeling/cumu_extinct_2layer_main_delta.npy', 'wb') as handle:
+        np.save(handle, cumu_extinct_delta)
+    with open('/gpfs1/home/m/c/mcboudre/scratch/hpv_modeling/cumu_extinct_2layer_main_poisson.npy', 'wb') as handle:
+        np.save(handle, cumu_extinct_poisson)
+  
+    with open('/gpfs1/home/m/c/mcboudre/scratch/hpv_modeling/extinct_mom_b_2layer_main_delta.npy', 'wb') as handle:
+        np.save(handle, extinct_mom_b_poisson)
+    with open('/gpfs1/home/m/c/mcboudre/scratch/hpv_modeling/extinct_mom_b_2layer_main_poisson.npy', 'wb') as handle:    
+        np.save(handle, extinct_mom_b_poisson)
 
-print('done')
-sys.stdout.flush()
+    print('done')
+    sys.stdout.flush()

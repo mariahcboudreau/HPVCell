@@ -56,7 +56,7 @@ shed = 2.0*(0.0082)*1.99 # similar to division but just a little bit different a
 rho = symm_div
 gamma = asymm_div
 delta = symm_div
-beta = symm_div+0.02
+beta = symm_div - 0.01
 theta = shed
 
 
