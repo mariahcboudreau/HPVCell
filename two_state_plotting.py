@@ -2,15 +2,19 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+
+
 with open('cumu_extinct_2layer_main_delta.npy', 'rb') as f:
     cumu_extinct_delta = np.load(f)
 with open('cumu_extinct_2layer_main_poisson.npy', 'rb') as f:
     cumu_extinct_poisson= np.load(f)
-    
-with open('extinct_mom_b_2layer_main_delta', 'rb') as f:
+
+# with open('m_path_2layer_main_1.npy', 'rb') as f:  
+#     m_path_delta = np.load(f)
+with open('extinct_mom_b_2layer_main_delta.npy', 'rb') as f:
     extinct_mom_b_delta = np.load(f)
 
-with open('extinct_mom_b_2layer_main_poisson', 'rb') as f:
+with open('extinct_mom_b_2layer_main_poisson.npy', 'rb') as f:
     extinct_mom_b_poisson = np.load(f)
 
 
@@ -18,17 +22,13 @@ t_length = 500
 t_steps = 500
 t_vec = np.linspace(0, t_length, t_steps)
 
+# extinct_mom_b_delta = np.zeros((t_length))
 
-
-
-
-
-
-
-
-
-
-
+# for t in range(t_length):
+#     if m_path_delta[t][2] != 0:
+#         extinct_mom_b_delta[t] = (1-((m_path_delta[t][0]**2)/(m_path_delta[t][2])))
+#     else: 
+#         extinct_mom_b_delta[t] = 0
 
 plt.plot(t_vec, cumu_extinct_delta, label = 'Cumulative probability of extinction - Explicit basals (Delta Approx)')
 plt.plot(t_vec, extinct_mom_b_delta, label = 'Cumulative probability of extinction - MOM basals (Delta Approx)')
@@ -41,15 +41,21 @@ plt.show()
 plt.close()
 
 
-plt.plot(t_vec, cumu_extinct_delta, label = 'Cumulative probability of extinction - Explicit basals (Delta Approx)')
+plt.plot(t_vec, cumu_extinct_poisson, label = 'Cumulative probability of extinction - Explicit basals (Poisson Approx)')
 plt.plot(t_vec, extinct_mom_b_poisson, label = 'Cumulative probability of extinction - MOM basals (Poisson Approx)')
 plt.legend()
 plt.ylabel('Probability')
 plt.xlabel('Time')
 plt.title('2 Layer system')
-# plt.savefig("extinction_prob.pdf", format = 'pdf')
+#plt.savefig("extinction_prob.pdf", format = 'pdf')
 plt.show()
 plt.close()
+
+
+with open('m_path_2layer_main_1.npy', 'rb') as f:
+    m_path = np.load(f)
+
+
 
 
 # import matplotlib.ticker as ticker

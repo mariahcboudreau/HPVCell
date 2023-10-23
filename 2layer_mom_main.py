@@ -44,9 +44,13 @@ t_vec = np.linspace(0, t_length, t_steps)
 
 # Initial conditions
 
-m_0 = np.zeros(5)
-m_0[0] = 1
-m_0[2] = 1
+m_0_delta = np.zeros(5)
+m_0_delta[0] = 1
+m_0_delta[2] = 1
+
+m_0_poisson = np.zeros(5)
+m_0_poisson[0] = 1
+m_0_poisson[2] = 2
 
 # Parameters of the model
 symm_div = 0.04
@@ -63,12 +67,15 @@ theta = shed
 
 # Integration
 M = lambda m, t: MOM(m, t, beta, gamma, delta, rho, theta)
-m_path = odeintw(M, m_0, t_vec)
+m_path_poisson = odeintw(M, m_0_poisson, t_vec)
+m_path_delta = odeintw(M, m_0_delta, t_vec)
 
 
 
 
 
 print('almost done pickling')
-with open('m_path_2layer_main_1.npy', 'wb') as handle:    
-    np.save(handle, m_path)
+with open('extinct_mom_b_2layer_main_poisson.npy', 'wb') as handle:    
+    np.save(handle, m_path_poisson)
+with open('extinct_mom_b2layer_main_delta.npy', 'wb') as handle:
+    np.save(handle, m_path_delta)

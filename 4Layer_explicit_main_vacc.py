@@ -122,9 +122,13 @@ def MOM(m, t, beta, gamma, delta, rho, alpha, sigma, theta): #figure out the rig
 print('time point')
 sys.stdout.flush()
 # Time of observations
-t_length = 500
-t_steps = 500
-t_vec = np.linspace(0, t_length, t_steps)
+# t_length = 500
+# t_steps = 500
+# t_vec = np.linspace(0, t_length, t_steps)
+
+job = 99
+
+t_point = job 
 
 # Initial conditions
 print('initial conditions')
@@ -161,20 +165,23 @@ print('integration')
 sys.stdout.flush()
 # Integration
 G = lambda x, t: J(x, t, beta, gamma, delta, rho, alpha, sigma, theta)
-x_path = odeintw(G, x_0, t_vec)
+x_path = odeintw(G, x_0, t_point)
 print('first ODE GOOD')
 sys.stdout.flush()
 M = lambda m, t: MOM(m, t, beta, gamma, delta, rho, alpha, sigma, theta)
-m_path = odeintw(M, m_0, t_vec)
+m_path = odeintw(M, m_0, t_point)
+
+
+
 
  
-print('saving')
-sys.stdout.flush()
-with open('/gpfs1/home/m/c/mcboudre/scratch/hpv_modeling/x_path_file_4layer_main.npy', 'wb') as handle:
-    np.save(handle, x_path)
-print('almost done saving')
-# with open('/gpfs1/home/m/c/mcboudre/scratch/hpv_modeling/m_path_4layer_main.npy', 'wb') as handle:    
-#     np.save(handle, m_path)
+# print('saving')
+# sys.stdout.flush()
+# with open('/gpfs1/home/m/c/mcboudre/scratch/hpv_modeling/x_path_file_4layer_main.npy', 'wb') as handle:
+#     np.save(handle, x_path)
+# print('almost done saving')
+# # with open('/gpfs1/home/m/c/mcboudre/scratch/hpv_modeling/m_path_4layer_main.npy', 'wb') as handle:    
+# #     np.save(handle, m_path)
 
-print('done')
-sys.stdout.flush()
+# print('done')
+# sys.stdout.flush()
