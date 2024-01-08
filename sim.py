@@ -7,6 +7,7 @@ import math
 
 
 
+
 def cell_division(event_queue, skin, cell, beta, gamma, rho, delta, theta, t):
     # Set event times
     if skin[cell]['type'] == 'basal':
@@ -43,22 +44,42 @@ all_history = []
 all_basal_history = []
 all_parabasal_history = []
 all_times = []
-all_sheds = []
+all_shed_times = []
+extinction_times = []
 
-# Parameters of the model
-symm_div = 0.04
-asymm_div = 1 - 2*symm_div # Asymmetric divisions are more probable, 84% chance
-shed = 2.0*(0.0082) # similar to division but just a little bit different according to the plos epithelial strat paper
+# Updated parameters
+R_b = 0.03          # Division rate of basal - Murall citation
+R_p = 0.39          # Division rate of parabasal - Murall citation
+symm_div = 0.16    # Symmetric division rate - Clayton
+asymm_div = 0.84    # Asymmetric division rate - Clayton
 
-rho = symm_div
-gamma = asymm_div
-delta = symm_div
-beta = symm_div
-theta = shed
+beta = R_b * symm_div  + 0.001      # bbb 
+gamma = R_b * asymm_div             # bbp
+delta = R_b * symm_div              # bpp
+rho = R_p * symm_div                # ppp
+theta = 0.67                        # Shed - Murall
+
+# # Parameters of the model - OLD
+
+# # Probability of type of division
+# symm_div = 0.04
+# asymm_div = 1 - 2*symm_div # Asymmetric divisions are more probable, 84% chance
+
+# # Rate of types of divisions
+
+
+# # Rate of shedding
+# shed = 2.0*(0.0082) # similar to division but just a little bit different according to the plos epithelial strat paper
+
+# rho = symm_div
+# gamma = asymm_div
+# delta = symm_div
+# beta = symm_div + 0.01
+# theta = shed
 basal_prop =  0.2 # TODO: Confirm proportion of basal cells 10^3 from plos epithelial
 parabasal_prop = 1 - basal_prop
 skin_size = 100000 #
-shed_amount = 100
+# shed_amount = 100
 
 # Simulation
 for s in range(num_sims):
@@ -70,7 +91,7 @@ for s in range(num_sims):
     skin = []
 
     # Initial conditions
-    shed = 0
+    dead = 0
     t = 0
     basals = 1
     parabasals = 0
@@ -83,15 +104,19 @@ for s in range(num_sims):
     history = []
     basal_history = []
     parabasal_history = []
-    shed_history = []
+    dead_history = []
     times = []
+  
+  
+
+
     history.append(active_cells / skin_size)
     basal_history.append(basals / skin_size)
     parabasal_history.append(parabasals / skin_size)
     times.append(t)
-    shed_history.append(shed)
+  
 
-    tmax = 1000
+    tmax = 500
     while t < tmax and len(event_queue) > 0:
         (time, cell, event) = heapq.heappop(event_queue)
         t = time
@@ -118,31 +143,123 @@ for s in range(num_sims):
                 skin.append({'type': 'parabasal'})
                 event_queue = cell_division(event_queue, skin, len(skin) - 1, beta, gamma, rho, delta, theta, t)
                 parabasals += 1
-            elif event == 'shed':
+            elif event == "shed":
                 skin[cell]['type'] = 'dead'
                 parabasals -= 1
-                shed += shed_amount
+                dead += 1
+                all_shed_times.append(t)
+                # dead_history.append(dead)
         else:
             if event == "shed":
                 skin[cell]['type'] = 'dead'
                 parabasals -= 1
-                shed += shed_amount
+                dead += 1
+                all_shed_times.append(t)
+                # dead_history.append(dead)
         active_cells = parabasals + basals
         history.append(active_cells/skin_size)
         basal_history.append(basals/skin_size)
         parabasal_history.append(parabasals/skin_size)
-        shed_history.append(shed)
         times.append(t)
     all_times.append(times)
     all_history.append(history)
     all_basal_history.append(basal_history)
     all_parabasal_history.append(parabasal_history)
-    all_sheds.append(shed_history)
+    # all_dead.append(dead_history)
+    # all_shed_times.append(shed_times)
+    try: 
+        ext_time = basal_history.index(0)
+        extinction_times.append(times[basal_history.index(0)])
+    except ValueError:
+        ext_time = tmax
+        extinction_times.append(tmax)
+
+
+
+### Extinction probability computation
+
+# extinction_count = np.zeros((tmax))
+
+# for i in range(num_sims-1):
+#     try:
+#         index  = all_basal_history[i].index(0)
+#     except ValueError:
+#         index = len(all_times[i]) - 1
+#     if np.ceil(all_times[i][index]) >= 200:
+#         time_point = 199
+#     else:
+#         time_point = np.ceil(all_times[i][index])
+#     if(time_point == 0):
+#         print('stop here')
+#     extinction_count[int(time_point)] += 1
+        
+
+with open('extinct_mom_b_2layer_main_geometric_1_8_500.npy', 'rb') as handle:    
+     extinct_mom_b_geometric = np.load(handle)
+
+# with open('cumu_extinct_2layer_main_delta_1_8.npy', 'rb') as f:
+#     cumu_extinct_delta = np.load(f)
+
+with open('shed_first_moments_delta_1-8_500.npy', 'rb') as f:
+    shed_first_moment_delta = np.load(f)
+
+# with open('shed_first_moments_poisson_12-11.npy', 'rb') as f:
+#     shed_first_moment_poisson = np.load(f)
+
+ext_count = np.zeros((tmax))
+for i in range(0,tmax): 
+    ext_count[i] = sum(j < i for j in extinction_times)
+
+prob_extinction = ext_count/num_sims
+
+dead_count = np.zeros((tmax))
+for i in range(0,tmax):
+    dead_count[i] = sum(j < i for j in all_shed_times)
+
+rate_shed = dead_count/num_sims
+
+
+plt.plot(np.linspace(0,tmax, tmax), prob_extinction, label= "Simulated probability of extinction - 5000 simulations")
+# plt.plot(np.linspace(0,200,200), cumu_extinct_delta, label = 'Cumulative probability of extinction - Explicit basals (Delta intital conditions)')
+plt.plot(np.linspace(0, tmax, tmax), extinct_mom_b_geometric, label = 'Cumulative probability of extinction - MOM basals (Geometric approx & Delta Initial conditions)')
+plt.title("Probabilty of Extinction - Simulations")
+plt.xlabel('Time')
+plt.ylabel('Probability')
+plt.legend()
+plt.show()
+plt.close()
 
 
 
 
-# Plotting
+# discrete_death_array = np.zeros((tmax, num_sims))
+# for t in range(1, tmax):
+#     for i in range(num_sims-1):
+#         index = [ti for ti in range(len(all_shed_times[i])) if all_shed_times[i][ti] < t]
+#          # index of the last dead event time under discrete time point
+#         if len(index) == 0:
+#             discrete_death_array[t][i] = 0 
+#         else:
+#             discrete_death_array[t][i] = all_dead[i][index[-1]] 
+        
+
+# avg_dead_array = np.mean(discrete_death_array, axis = 1)
+avg_virions_array = np.zeros((tmax))
+for i in range(tmax):
+    avg_virions_array[i] = 1000*rate_shed[i]
+
+
+
+plt.plot(np.linspace(0,tmax,tmax), avg_virions_array, label = "Simulated - 1000 simulations")
+plt.plot(np.linspace(0,tmax,tmax), shed_first_moment_delta, label = "MOM derivation - Delta initial conditions")
+#eplt.plot(np.linspace(0,tmax,tmax), shed_first_moment_poisson, label = "MOM derivation - Poisson initial conditions")
+plt.title("Average virions over time")
+plt.xlabel('Time')
+plt.legend()
+plt.show()
+
+
+# Plotting flat simulations
 
 
 

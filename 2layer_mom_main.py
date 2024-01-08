@@ -38,8 +38,8 @@ def MOM(m, t, beta, gamma, delta, rho, theta): #figure out the right way to do t
 
 
 # Time of observations
-t_length = 500
-t_steps = 500
+t_length = 200
+t_steps = 200
 t_vec = np.linspace(0, t_length, t_steps)
 
 # Initial conditions
@@ -60,7 +60,7 @@ shed = 2.0*(0.0082)*1.99 # similar to division but just a little bit different a
 rho = symm_div
 gamma = asymm_div
 delta = symm_div
-beta = symm_div - 0.01
+beta = symm_div + 0.01
 theta = shed
 
 
@@ -70,12 +70,44 @@ M = lambda m, t: MOM(m, t, beta, gamma, delta, rho, theta)
 m_path_poisson = odeintw(M, m_0_poisson, t_vec)
 m_path_delta = odeintw(M, m_0_delta, t_vec)
 
+print("done integrating")
 
+extinct_mom_b_delta = np.zeros((len(t_vec)))
+extinct_mom_b_poisson = np.zeros((len(t_vec)))
+   # # MOM
+for ti in range(0, len(t_vec)):
 
+    if m_path_delta[ti][2] != 0:
+        extinct_mom_b_delta[ti] = (1-((m_path_delta[ti][0]**2)/(m_path_delta[ti][2])))
+    else: 
+        extinct_mom_b_delta[ti] = 0
 
+    # if ( ((m_path_poisson[ti][2] - m_path_poisson[ti][0]) != 0) & (ti > 9) ):
+    extinct_mom_b_poisson[ti] = 1 - (m_path_poisson[ti][0]**2)/(m_path_poisson[ti][2] - m_path_poisson[ti][0]) 
+# else: 
+    # extinct_mom_b_poisson[ti] = 0
 
-print('almost done pickling')
-with open('extinct_mom_b_2layer_main_poisson.npy', 'wb') as handle:    
-    np.save(handle, m_path_poisson)
-with open('extinct_mom_b2layer_main_delta.npy', 'wb') as handle:
-    np.save(handle, m_path_delta)
+plt.plot(t_vec, extinct_mom_b_delta, label = 'Cumulative probability of extinction - MOM basals (Delta Approx)')
+plt.plot(t_vec, extinct_mom_b_poisson, label = 'Cumulative probability of extinction - MOM basals (Poisson Approx)')
+plt.legend()
+plt.ylabel('Probability')
+plt.xlabel('Time')
+plt.title('2 Layer system')
+# plt.savefig("extinction_prob.pdf", format = 'pdf')
+plt.show()
+plt.close()
+
+# plt.plot(t_vec, extinct_mom_b_poisson, label = 'Cumulative probability of extinction - MOM basals (Poisson Approx)')
+# plt.legend()
+# plt.ylabel('Probability')
+# plt.xlabel('Time')
+# plt.title('2 Layer system')
+# #plt.savefig("extinction_prob.pdf", format = 'pdf')
+# plt.show()
+# plt.close()
+
+# print('almost done pickling')
+# with open('extinct_mom_b_2layer_main_poisson_11_17.npy', 'wb') as handle:    
+#     np.save(handle, extinct_mom_b_poisson)
+# with open('extinct_mom_b_2layer_main_delta_11_17.npy', 'wb') as handle:
+#     np.save(handle, extinct_mom_b_delta)
