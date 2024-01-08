@@ -46,6 +46,7 @@ all_parabasal_history = []
 all_times = []
 all_shed_times = []
 extinction_times = []
+shed_times_history = []
 
 # Updated parameters
 R_b = 0.03          # Division rate of basal - Murall citation
@@ -106,7 +107,7 @@ for s in range(num_sims):
     parabasal_history = []
     dead_history = []
     times = []
-  
+    sheds = []
   
 
 
@@ -114,6 +115,7 @@ for s in range(num_sims):
     basal_history.append(basals / skin_size)
     parabasal_history.append(parabasals / skin_size)
     times.append(t)
+    
   
 
     tmax = 500
@@ -148,6 +150,7 @@ for s in range(num_sims):
                 parabasals -= 1
                 dead += 1
                 all_shed_times.append(t)
+                sheds.append(t)
                 # dead_history.append(dead)
         else:
             if event == "shed":
@@ -155,6 +158,7 @@ for s in range(num_sims):
                 parabasals -= 1
                 dead += 1
                 all_shed_times.append(t)
+                sheds.append(t)
                 # dead_history.append(dead)
         active_cells = parabasals + basals
         history.append(active_cells/skin_size)
@@ -165,6 +169,7 @@ for s in range(num_sims):
     all_history.append(history)
     all_basal_history.append(basal_history)
     all_parabasal_history.append(parabasal_history)
+    shed_times_history.append(sheds)
     # all_dead.append(dead_history)
     # all_shed_times.append(shed_times)
     try: 
@@ -213,20 +218,34 @@ for i in range(0,tmax):
 prob_extinction = ext_count/num_sims
 
 dead_count = np.zeros((tmax))
+ind_dead_count = np.zeros((num_sims, tmax))
 for i in range(0,tmax):
     dead_count[i] = sum(j < i for j in all_shed_times)
+    for s in range(num_sims):
+        ind_dead_count[s,i] = sum(j < i for j in shed_times_history[s])
+
+vars = np.zeros(tmax)
+for i in range(0,tmax):
+    vars[i] = np.var(ind_dead_count[:,i])
+
+vars = 1000**2 * vars
 
 rate_shed = dead_count/num_sims
 
 
-plt.plot(np.linspace(0,tmax, tmax), prob_extinction, label= "Simulated probability of extinction - 5000 simulations")
+
+
+
+
+plt.plot(np.linspace(0,tmax, tmax), prob_extinction, label= "Simulated probability of extinction - %d simulations" %(num_sims))
 # plt.plot(np.linspace(0,200,200), cumu_extinct_delta, label = 'Cumulative probability of extinction - Explicit basals (Delta intital conditions)')
 plt.plot(np.linspace(0, tmax, tmax), extinct_mom_b_geometric, label = 'Cumulative probability of extinction - MOM basals (Geometric approx & Delta Initial conditions)')
 plt.title("Probabilty of Extinction - Simulations")
 plt.xlabel('Time')
 plt.ylabel('Probability')
 plt.legend()
-plt.show()
+# plt.show()
+plt.savefig('probextinct-sims1000-time500_1_8.pdf', format = 'pdf')
 plt.close()
 
 
@@ -245,18 +264,22 @@ plt.close()
 
 # avg_dead_array = np.mean(discrete_death_array, axis = 1)
 avg_virions_array = np.zeros((tmax))
-for i in range(tmax):
-    avg_virions_array[i] = 1000*rate_shed[i]
+
+avg_virions_array = 1000*rate_shed
 
 
 
-plt.plot(np.linspace(0,tmax,tmax), avg_virions_array, label = "Simulated - 1000 simulations")
-plt.plot(np.linspace(0,tmax,tmax), shed_first_moment_delta, label = "MOM derivation - Delta initial conditions")
+plt.plot(np.linspace(0,tmax,tmax), avg_virions_array, label = "Simulated - %d simulations" %(num_sims))
+plt.plot(np.linspace(0,tmax,tmax), shed_first_moment_delta, label = "MoM derivation - Delta initial conditions")
+# for time in range(0,499, 50):
+#     plt.errorbar(time, avg_virions_array[time], yerr = vars[time], ecolor= 'blue')
 #eplt.plot(np.linspace(0,tmax,tmax), shed_first_moment_poisson, label = "MOM derivation - Poisson initial conditions")
 plt.title("Average virions over time")
 plt.xlabel('Time')
+# plt.ylim(0, 25000)
 plt.legend()
-plt.show()
+#plt.show()
+# plt.savefig('avg_viral_load-sims1000-time500_1_8.pdf', format = 'pdf')
 
 
 # Plotting flat simulations
