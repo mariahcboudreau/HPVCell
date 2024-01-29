@@ -5,22 +5,24 @@ import heapq
 import math
 
 
-
-
-
+####
+#
+#   
+#
+####
 def cell_division(event_queue, skin, cell, beta, gamma, rho, delta, theta, t):
     # Set event times
     if skin[cell]['type'] == 'basal':
         tau_bbb = np.random.exponential(scale= 1/beta)
         tau_bbp = np.random.exponential(scale= 1/gamma)
         if tau_bbb < tau_bbp:
-            tau_bpp = np.random.exponential(scale=1 / delta)
+            tau_bpp = np.random.exponential(scale= 1/delta)
             if tau_bbb < tau_bpp:
                 heapq.heappush(event_queue, (t + tau_bbb, cell, 'division - bbb'))
             else:
                 heapq.heappush(event_queue, (t + tau_bpp, cell, 'division - bpp'))
         else:
-            tau_bpp = np.random.exponential(scale=1 / delta)
+            tau_bpp = np.random.exponential(scale= 1/delta)
             if tau_bbp < tau_bpp:
                 heapq.heappush(event_queue, (t + tau_bbp, cell, 'division - bbp'))
             else:
@@ -51,7 +53,7 @@ shed_times_history = []
 # Updated parameters
 R_b = 0.03          # Division rate of basal - Murall citation
 R_p = 0.39          # Division rate of parabasal - Murall citation
-symm_div = 0.16    # Symmetric division rate - Clayton
+symm_div = 0.08    # Symmetric division rate - Clayton
 asymm_div = 0.84    # Asymmetric division rate - Clayton
 
 beta = R_b * symm_div  + 0.001      # bbb 
@@ -59,6 +61,7 @@ gamma = R_b * asymm_div             # bbp
 delta = R_b * symm_div              # bpp
 rho = R_p * symm_div                # ppp
 theta = 0.67                        # Shed - Murall
+
 
 # # Parameters of the model - OLD
 
@@ -77,7 +80,7 @@ theta = 0.67                        # Shed - Murall
 # delta = symm_div
 # beta = symm_div + 0.01
 # theta = shed
-basal_prop =  0.2 # TODO: Confirm proportion of basal cells 10^3 from plos epithelial
+basal_prop =  0.1 # TODO: Confirm proportion of basal cells 10^3 from plos epithelial
 parabasal_prop = 1 - basal_prop
 skin_size = 100000 #
 # shed_amount = 100
@@ -95,11 +98,12 @@ for s in range(num_sims):
     dead = 0
     t = 0
     basals = 1
-    parabasals = 0
+    parabasals = 1
     active_cells = parabasals + basals
     skin.append({'type': 'basal'})
     event_queue = cell_division(event_queue, skin, 0, beta, gamma, rho, delta, theta, t)
-
+    skin.append( {'type': 'parabasal'})
+    event_queue = cell_division(event_queue, skin, 1, beta, gamma, rho, delta, theta, t)
     # Counter
 
     history = []
@@ -111,67 +115,68 @@ for s in range(num_sims):
   
 
 
-    history.append(active_cells / skin_size)
-    basal_history.append(basals / skin_size)
-    parabasal_history.append(parabasals / skin_size)
+    history.append(active_cells)
+    basal_history.append(basals )
+    parabasal_history.append(parabasals)
     times.append(t)
     
-  
 
+##
+# Infinite population
+##
     tmax = 500
     while t < tmax and len(event_queue) > 0:
         (time, cell, event) = heapq.heappop(event_queue)
         t = time
-        if active_cells < skin_size:
-            if event == 'division - bbb' and (basals/skin_size) < basal_prop :
-                skin.append({'type': 'basal'})
-                event_queue = cell_division(event_queue, skin, len(skin)-1, beta, gamma,  rho, delta, theta, t)
-                event_queue = cell_division(event_queue, skin, cell, beta, gamma, rho, delta, theta, t)
-                basals += 1
-            elif event == 'division - bpp':
-                skin.append({'type': 'parabasal'})
-                event_queue = cell_division(event_queue, skin, len(skin) - 1, beta, gamma, rho, delta, theta, t)
-                skin.append({'type': 'parabasal'})
-                event_queue = cell_division(event_queue, skin, len(skin) - 1, beta, gamma, rho, delta, theta, t)
-                skin[cell]['type'] = 'dead'
-                parabasals += 2
-                basals -= 1
-            elif event == "division - bbp":
-                skin.append({'type': 'parabasal'})
-                event_queue = cell_division(event_queue, skin, len(skin) - 1, beta, gamma, rho, delta, theta, t)
-                event_queue = cell_division(event_queue, skin, cell, beta, gamma, rho, delta, theta, t)
-                parabasals += 1
-            elif event == "division - ppp":
-                skin.append({'type': 'parabasal'})
-                event_queue = cell_division(event_queue, skin, len(skin) - 1, beta, gamma, rho, delta, theta, t)
-                parabasals += 1
-            elif event == "shed":
-                skin[cell]['type'] = 'dead'
-                parabasals -= 1
-                dead += 1
-                all_shed_times.append(t)
-                sheds.append(t)
-                # dead_history.append(dead)
-        else:
-            if event == "shed":
-                skin[cell]['type'] = 'dead'
-                parabasals -= 1
-                dead += 1
-                all_shed_times.append(t)
-                sheds.append(t)
-                # dead_history.append(dead)
+        if event == 'division - bbb':
+            skin.append({'type': 'basal'})
+            event_queue = cell_division(event_queue, skin, len(skin)-1, beta, gamma,  rho, delta, theta, t)
+            event_queue = cell_division(event_queue, skin, cell, beta, gamma, rho, delta, theta, t)
+            basals += 1
+        elif event == 'division - bpp':
+            skin.append({'type': 'parabasal'})
+            event_queue = cell_division(event_queue, skin, len(skin) - 1, beta, gamma, rho, delta, theta, t)
+            skin.append({'type': 'parabasal'})
+            event_queue = cell_division(event_queue, skin, len(skin) - 1, beta, gamma, rho, delta, theta, t)
+            skin[cell]['type'] = 'dead'
+            parabasals += 2
+            basals -= 1
+        elif event == "division - bbp":
+            skin.append({'type': 'parabasal'})
+            event_queue = cell_division(event_queue, skin, len(skin) - 1, beta, gamma, rho, delta, theta, t)
+            event_queue = cell_division(event_queue, skin, cell, beta, gamma, rho, delta, theta, t)
+            parabasals += 1
+        elif event == "division - ppp":
+            skin.append({'type': 'parabasal'})
+            event_queue = cell_division(event_queue, skin, len(skin) - 1, beta, gamma, rho, delta, theta, t)
+            parabasals += 1
+        elif event == "shed":
+            skin[cell]['type'] = 'dead'
+            parabasals -= 1
+            dead += 1
+            all_shed_times.append(t)
+            sheds.append(t)
+            # dead_history.append(dead)
+        
+            # if event == "shed":
+            #     skin[cell]['type'] = 'dead'
+            #     parabasals -= 1
+            #     dead += 1
+            #     all_shed_times.append(t)
+            #     sheds.append(t)
+            #     # dead_history.append(dead)
         active_cells = parabasals + basals
-        history.append(active_cells/skin_size)
-        basal_history.append(basals/skin_size)
-        parabasal_history.append(parabasals/skin_size)
+        history.append(active_cells)
+        basal_history.append(basals)
+        parabasal_history.append(parabasals)
         times.append(t)
     all_times.append(times)
     all_history.append(history)
     all_basal_history.append(basal_history)
     all_parabasal_history.append(parabasal_history)
     shed_times_history.append(sheds)
-    # all_dead.append(dead_history)
-    # all_shed_times.append(shed_times)
+        # all_dead.append(dead_history)
+        # all_shed_times.append(shed_times)
     try: 
         ext_time = basal_history.index(0)
         extinction_times.append(times[basal_history.index(0)])
@@ -181,35 +186,24 @@ for s in range(num_sims):
 
 
 
-### Extinction probability computation
-
-# extinction_count = np.zeros((tmax))
-
-# for i in range(num_sims-1):
-#     try:
-#         index  = all_basal_history[i].index(0)
-#     except ValueError:
-#         index = len(all_times[i]) - 1
-#     if np.ceil(all_times[i][index]) >= 200:
-#         time_point = 199
-#     else:
-#         time_point = np.ceil(all_times[i][index])
-#     if(time_point == 0):
-#         print('stop here')
-#     extinction_count[int(time_point)] += 1
-        
-
-with open('extinct_mom_b_2layer_main_geometric_1_8_500.npy', 'rb') as handle:    
+with open('extinction_mom_b_2layer_geometric_1-29_500.npy', 'rb') as handle:    
      extinct_mom_b_geometric = np.load(handle)
 
 # with open('cumu_extinct_2layer_main_delta_1_8.npy', 'rb') as f:
 #     cumu_extinct_delta = np.load(f)
 
-with open('shed_first_moments_delta_1-8_500.npy', 'rb') as f:
+with open('shed_first_moments_delta_1-15_sans1000_500.npy', 'rb') as f:
     shed_first_moment_delta = np.load(f)
 
-# with open('shed_first_moments_poisson_12-11.npy', 'rb') as f:
-#     shed_first_moment_poisson = np.load(f)
+# with open('para_first_moments_geom_1-15_500.npy', 'rb') as f:
+#     para_first_moment = np.load(f)
+
+with open('basal_first_moment_geom_1-29_500.npy', 'rb') as f:
+    basal_first_moment= np.load(f)
+
+with open('para_first_moment_geom_1-29_500.npy', 'rb') as f:
+    para_first_moment = np.load(f)
+
 
 ext_count = np.zeros((tmax))
 for i in range(0,tmax): 
@@ -232,20 +226,61 @@ vars = 1000**2 * vars
 
 rate_shed = dead_count/num_sims
 
+## Compute the standard deviation 
+
+margin_error = np.zeros(tmax)
+for t in range(tmax):
+    margin_error[t] = 1.96 * ( np.sqrt(vars[t])/ np.sqrt(num_sims)) 
 
 
+# 
+para_avg = np.zeros(tmax)
+for s in range(num_sims):
+    for i in range(len(all_times[s])-1):
+         for j in range(int(np.ceil(all_times[s])[i]), int(np.ceil(all_times[s])[i+1]-1)):
+                if j >= 500:
+                    para_avg[-1] += all_parabasal_history[s][i]
+                else:
+                    para_avg[j] += all_parabasal_history[s][i]
+
+para_avg = para_avg/num_sims
+
+plt.plot(np.linspace(0,tmax-1,tmax-1), para_first_moment[0:499], label = 'MoM para average')
+plt.plot(np.linspace(0,tmax-1,tmax-1), para_avg[0:499], label = 'Simulations para average')
+plt.legend()
+plt.show()
+# 
+b_avg = np.zeros(tmax)
+for s in range(num_sims):
+    for i in range(len(all_times[s])-1):
+         for j in range(int(np.ceil(all_times[s])[i]), int(np.ceil(all_times[s])[i+1]-1)):
+                if j >= 500:
+                    b_avg[-1] += all_basal_history[s][i]
+                else:
+                    b_avg[j] += all_basal_history[s][i]
+
+b_avg = b_avg/num_sims
+
+plt.plot(np.linspace(0,tmax-1,tmax-1), basal_first_moment[0:499], label = 'MoM b average')
+plt.plot(np.linspace(0,tmax-1,tmax-1), b_avg[0:499], label = 'Simulations b average')
+plt.legend()
+plt.show()
 
 
+plt.plot(np.linspace(0,tmax,tmax), shed_first_moment_delta, label = 'MoM Parabasal average times theta')
+plt.plot(np.linspace(0,tmax,tmax), rate_shed, label = 'Simulated rate of shed')
+plt.legend()
+plt.show()
 
-plt.plot(np.linspace(0,tmax, tmax), prob_extinction, label= "Simulated probability of extinction - %d simulations" %(num_sims))
+plt.plot(np.linspace(0,tmax, tmax), prob_extinction, marker = "+", linewidth = 3, label= "Simulated probability of extinction - %d simulations" %(num_sims))
 # plt.plot(np.linspace(0,200,200), cumu_extinct_delta, label = 'Cumulative probability of extinction - Explicit basals (Delta intital conditions)')
-plt.plot(np.linspace(0, tmax, tmax), extinct_mom_b_geometric, label = 'Cumulative probability of extinction - MOM basals (Geometric approx & Delta Initial conditions)')
-plt.title("Probabilty of Extinction - Simulations")
+plt.plot(np.linspace(0, tmax, tmax), extinct_mom_b_geometric, linewidth = 3, label = 'Cumulative probability of extinction - MoM')
+plt.title("Probabilty of Extinction of Infected Basal Cells")
 plt.xlabel('Time')
 plt.ylabel('Probability')
 plt.legend()
-# plt.show()
-plt.savefig('probextinct-sims1000-time500_1_8.pdf', format = 'pdf')
+plt.show()
+# plt.savefig('probextinct-geom_simsMill-time500_1_9.pdf', format = 'pdf')
 plt.close()
 
 
@@ -271,16 +306,22 @@ avg_virions_array = 1000*rate_shed
 
 plt.plot(np.linspace(0,tmax,tmax), avg_virions_array, label = "Simulated - %d simulations" %(num_sims))
 plt.plot(np.linspace(0,tmax,tmax), shed_first_moment_delta, label = "MoM derivation - Delta initial conditions")
+plt.plot(np.linspace(0,tmax,tmax), avg_virions_array + margin_error, c = 'grey')
+plt.plot(np.linspace(0,tmax,tmax), avg_virions_array - margin_error, c = 'grey', label = "95% CI")
 # for time in range(0,499, 50):
 #     plt.errorbar(time, avg_virions_array[time], yerr = vars[time], ecolor= 'blue')
-#eplt.plot(np.linspace(0,tmax,tmax), shed_first_moment_poisson, label = "MOM derivation - Poisson initial conditions")
 plt.title("Average virions over time")
 plt.xlabel('Time')
-# plt.ylim(0, 25000)
+plt.ylim(0, 25000)
 plt.legend()
-#plt.show()
+plt.show()
 # plt.savefig('avg_viral_load-sims1000-time500_1_8.pdf', format = 'pdf')
 
+
+# with open('simulated_probextinct_geom_numsim-million_infpop_date1-9_time500.npy', 'wb') as f:
+#     np.save(f, prob_extinction)
+# with open('simulated_avg-virions_geom_numsim-million_infpop_date1-9_time500.npy', 'wb') as f:
+#     np.save(f, avg_virions_array)
 
 # Plotting flat simulations
 

@@ -36,7 +36,7 @@ def MOM(m, t, beta, gamma, delta, rho, theta): #figure out the right way to do t
     # Covariance for bp
     dx[4] = beta * m[4] - theta * m[4] + rho * m[4] + gamma * m[2] - delta * m[4] + 2 * delta * m[2] - 2 * delta * m[0]
     # Shed first moment
-    dx[5] = theta*1000*m[1]
+    dx[5] = 1000*theta*m[1]
     # Shed second moment
     dx[6] = theta*1000**2*m[3]
     return dx
@@ -74,7 +74,7 @@ m_0_poisson[2] = 2
 # Updated parameters
 R_b = 0.03          # Division rate of basal - Murall citation
 R_p = 0.39          # Division rate of parabasal - Murall citation
-symm_div = 0.16     # Symmetric division rate - Clayton
+symm_div = 0.08     # Symmetric division rate - Clayton
 asymm_div = 0.84    # Asymmetric division rate - Clayton
 
 beta = R_b * symm_div  + 0.001      # bbb 
@@ -92,14 +92,14 @@ m_path_delta_geo = odeintw(M, m_0_delta_geo, t_vec)
 print("done integrating")
 
 
-with open('cumu_extinct_2layer_main_delta_last_12-11.npy', 'rb') as f:
-    cumu_extinct_delta_last = np.load(f)
-with open('cumu_extinct_2layer_main_poisson_last_12-11.npy', 'rb') as f:
-    cumu_extinct_poisson_last = np.load(f)
-with open('cumu_extinct_2layer_main_delta_11_27.npy', 'rb') as f:
-    cumu_extinct_delta = np.load(f)
-with open('cumu_extinct_2layer_main_poisson_11_13.npy', 'rb') as f:
-    cumu_extinct_poisson= np.load(f)
+# with open('cumu_extinct_2layer_main_delta_last_12-11.npy', 'rb') as f:
+#     cumu_extinct_delta_last = np.load(f)
+# with open('cumu_extinct_2layer_main_poisson_last_12-11.npy', 'rb') as f:
+#     cumu_extinct_poisson_last = np.load(f)
+# with open('cumu_extinct_2layer_main_delta_11_27.npy', 'rb') as f:
+#     cumu_extinct_delta = np.load(f)
+# with open('cumu_extinct_2layer_main_poisson_11_13.npy', 'rb') as f:
+#     cumu_extinct_poisson= np.load(f)
 
 
 
@@ -126,18 +126,22 @@ for ti in range(0, len(t_vec)):
     # extinct_mom_b_power[ti] = 1 - (m_path_poisson[ti][0]**2)/(m_path_poisson[ti][2]) + scipy.stats.powerlaw.pdf(x=0, a = ((3*m_path_poisson[ti][2] - 2*m_path_poisson[ti][0])/(m_path_poisson[ti][2]-m_path_poisson[ti][0])))
 
 # Geometric distribution reconstruction
-from scipy.stats import geom
+# from scipy.stats import geom
 
-p = 1/shed_moments[0][100]
-x = np.arange(0,200)
-plt.plot(x, geom.pmf(x, p), 'bo', ms=8, label='geom pmf')
-plt.vlines(x, 0, geom.pmf(x, p), colors='b', lw=5, alpha=0.5)
-plt.show()
+# p = 1/shed_moments[0][100]
+# x = np.arange(0,200)
+# plt.plot(x, geom.pmf(x, p), 'bo', ms=8, label='geom pmf')
+# plt.vlines(x, 0, geom.pmf(x, p), colors='b', lw=5, alpha=0.5)
+# plt.show()
 
-with open('shed_first_moments_delta_1-8_500.npy', 'wb') as f:
+with open('extinction_mom_b_2layer_geometric_1-29_500.npy', 'wb') as f:
+    np.save(f, extinct_mom_b_geometric)
+with open('shed_first_moments_delta_1-15_sans1000_500.npy', 'wb') as f:
     np.save(f, m_path_delta_geo[:,5])
-# with open('shed_first_moments_poisson_12-11.npy', 'wb') as f:
-#     np.save(f, m_path_poisson[:,5])
+with open('basal_first_moment_geom_1-29_500.npy', 'wb') as f:
+    np.save(f, m_path_delta_geo[:,0])
+with open('para_first_moment_geom_1-29_500.npy', 'wb') as f:
+    np.save(f, m_path_delta_geo[:,1])
 
 # # plt.plot(t_vec, cumu_extinct_poisson, label = 'Cumulative probability of extinction - Explicit basals (Poisson intital conditions)')
 # plt.plot(t_vec, cumu_extinct_delta, label = 'Cumulative probability of extinction - Explicit basals (Delta intital conditions)')
@@ -186,8 +190,8 @@ with open('shed_first_moments_delta_1-8_500.npy', 'wb') as f:
 
 
 
-with open('extinct_mom_b_2layer_main_geometric_1_8_500.npy', 'wb') as handle:    
-    np.save(handle, extinct_mom_b_geometric)
+# with open('extinct_mom_b_2layer_main_geometric_1_8_500.npy', 'wb') as handle:    
+#     np.save(handle, extinct_mom_b_geometric)
 # with open('extinct_mom_b_2layer_main_delta_11_20.npy', 'wb') as handle:
 #     np.save(handle, extinct_mom_b_delta_geo)
 

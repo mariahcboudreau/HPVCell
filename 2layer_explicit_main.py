@@ -114,16 +114,17 @@ cumu_extinct_poisson = np.zeros((time_total))
 extinct_mom_b_delta = np.zeros((time_total))
 extinct_mom_b_poisson = np.zeros((time_total))
 
-# Parameters of the model
-symm_div = 0.04
-asymm_div = 1 - 2*symm_div # Asymmetric divisions are more probable, 84% chance
-shed = 2.0*(0.0082)*1.99 # similar to division but just a little bit different according to the plos epithelial strat paper
+# Updated parameters
+R_b = 0.03          # Division rate of basal - Murall citation
+R_p = 0.39          # Division rate of parabasal - Murall citation
+symm_div = 0.08     # Symmetric division rate - Clayton
+asymm_div = 0.84    # Asymmetric division rate - Clayton
 
-rho = symm_div
-gamma = asymm_div
-delta = symm_div
-beta = symm_div - 0.01
-theta = shed
+beta = R_b * symm_div  + 0.001      # bbb 
+gamma = R_b * asymm_div             # bbp
+delta = R_b * symm_div              # bpp
+rho = R_p * symm_div                # ppp
+theta = 0.67                        # Shed - Murall
 
 
 x_delta = x_0_delta
@@ -142,69 +143,38 @@ m_poisson = m_0_poisson
 G = lambda x, t: J(x, t, beta, gamma, delta, rho, theta)
 
 for time in range(0, time_total):
-    print(time,x_delta.shape,x_poisson.shape)
+    # print(time,x_delta.shape,x_poisson.shape)
 
     # Integration
     print("integrating 1 ")
     x_path_delta = odeintw(G, x_delta, [time, time+1])
 
     
-    print('integrating 2')
-    x_path_poisson = odeintw(G, x_poisson, [time, time+1])
+    # print('integrating 2')
+    # x_path_poisson = odeintw(G, x_poisson, [time, time+1])
 
-    M = lambda m, t: MOM(m, t, beta, gamma, delta, rho, theta)
-    m_path_delta = odeintw(M, m_delta, [time, time+1])
+   
 
-    M = lambda m, t: MOM(m, t, beta, gamma, delta, rho, theta)
-    m_path_poisson = odeintw(M, m_poisson, [time, time+1])
-
-
-    ####
-    ## Solving for extinction probabilities 
-    ####
-        # Explicit ME
-
-    print("Calculating")
-    cumu_extinct_delta[time] = np.sum(x_path_delta[1][0][:])
-    
-    cumu_extinct_poisson[time] = np.sum(x_path_poisson[1][0][:])
-    
-    # # MOM
-    if m_path_delta[1][2] != 0:
-        extinct_mom_b_delta[time] = (1-((m_path_delta[1][0]**2)/(m_path_delta[1][2])))
-    else: 
-        extinct_mom_b_delta[time] = 0
-
-    if ( ((m_path_poisson[1][2] - m_path_poisson[1][0]) != 0) & (time > 9) ):
-        extinct_mom_b_poisson[time] = 1 - (m_path_poisson[1][0]**2)/(m_path_poisson[1][2] - m_path_poisson[1][0]) 
-    else: 
-        extinct_mom_b_poisson[time] = 0
-
-    print('reassignment')
-    x_delta = x_path_delta[1]
-    x_poisson = x_path_poisson[1]
-    # m_delta = m_path_delta[1]
-    # m_poisson = m_path_poisson[1]
-
+  
 
 
 
 print('saving')
-sys.stdout.flush()
+# sys.stdout.flush()
 
-with open('cumu_extinct_2layer_main_delta.npy', 'wb') as handle:
-    np.save(handle, cumu_extinct_delta)
-with open('cumu_extinct_2layer_main_poisson.npy', 'wb') as handle:
-    np.save(handle, cumu_extinct_poisson)
+# with open('cumu_extinct_2layer_main_delta.npy', 'wb') as handle:
+#     np.save(handle, cumu_extinct_delta)
+# with open('cumu_extinct_2layer_main_poisson.npy', 'wb') as handle:
+#     np.save(handle, cumu_extinct_poisson)
 
-# with open('extinct_mom_b_2layer_main_delta.npy', 'wb') as handle:
-#     np.save(handle, extinct_mom_b_poisson)
-# with open('extinct_mom_b_2layer_main_poisson.npy', 'wb') as handle:    
-#     np.save(handle, extinct_mom_b_poisson)
+# # with open('extinct_mom_b_2layer_main_delta.npy', 'wb') as handle:
+# #     np.save(handle, extinct_mom_b_poisson)
+# # with open('extinct_mom_b_2layer_main_poisson.npy', 'wb') as handle:    
+# #     np.save(handle, extinct_mom_b_poisson)
 
-end = time.time()
-print('done')
-print(end - start)
+# end = time.time()
+# print('done')
+# print(end - start)
 
 
 #######
@@ -243,34 +213,3 @@ print(x_path_poisson[3], x_path_poisson[6])
 # m_path_poisson = odeintw(M, m_poisson, t)
 
 
-    ####
-    ## Solving for extinction probabilities 
-    ####
-print('extinction')
-    # Explicit ME
-for t in range(0, time_total):
-    cumu_extinct_delta[t] = np.sum(x_path_delta[t][0][:])
-    #cumu_extinct_delta[t+1] = np.sum(x_path_delta[1][0][:])
-    
-    cumu_extinct_poisson[t] = np.sum(x_path_poisson[t][0][:])
-    #cumu_extinct_poisson[time+1] = np.sum(x_path_poisson[1][0][:])
-
-    # # MOM
-    # if m_path_delta[t][2] != 0:
-    #     extinct_mom_b_delta[t] = (1-((m_path_delta[t][0]**2)/(m_path_delta[t][2])))
-    # else: 
-    #     extinct_mom_b_delta[t] = 0
-
-    # if ( ((m_path_poisson[0][2] - m_path_poisson[t][0]) != 0) & (t > 9) ):
-    #     extinct_mom_b_poisson[t] = 1 - (m_path_poisson[t][0]**2)/(m_path_poisson[t][2] - m_path_poisson[t][0]) 
-    # else: 
-    #     extinct_mom_b_poisson[t] = 0
-
-    # if m_path_delta[1][2] != 0:
-    #     extinct_mom_b_delta[time+1] = (1-((m_path_delta[1][0]**2)/(m_path_delta[1][2])))
-    # else: 
-    #     extinct_mom_b_delta[time+1] = 0
-    # if ( ((m_path_poisson[1][2] - m_path_poisson[1][0]) != 0) | (time+1 > 9) ):
-    #     extinct_mom_b_poisson[time+1] = 1 - (m_path_poisson[1][0]**2)/(m_path_poisson[1][2] - m_path_poisson[1][0]) 
-    # else: 
-    #     extinct_mom_b_poisson[time+1] = 0
