@@ -13,7 +13,7 @@ import csv
 ####
 
 
-num_sims = 5000
+num_sims = 100000
 tmax = 500
 dt=100
 
@@ -54,13 +54,13 @@ with open('extinction_times_02-22_time500_sims5000.npy', 'rb') as f:
 # with open('all_shed_times_02-22_time500_sims5000.npy', 'rb') as read_obj:
 #     all_shed_times = np.load(read_obj)
 
-with open('otherbasal_history_02-23_time500_sims5000.npy', 'rb') as f:
+with open('otherbasal_history_02-23_time500_sims100000.npy', 'rb') as f:
     basal_history_other = np.load(f) 
 
-with open('otherparabasal_history_02-23_time500_sims5000.npy', 'rb') as f:
+with open('otherparabasal_history_02-23_time500_sims100000.npy', 'rb') as f:
     parabasal_history_other = np.load(f)
 
-with open('otherdead_history_02-23_time500_sims5000.npy', 'rb') as f:
+with open('otherdead_history_02-23_time500_sims100000.npy', 'rb') as f:
     dead_count = np.load(f)
 
 
@@ -100,6 +100,11 @@ prob_extinction = ext_count/num_sims
 ######
 # Calculating the rate of shed
 ######
+
+
+# shedded_p = (0.67)*(parabasal_history_other/num_sims)
+# avg_virions = 1000*shedded_p
+
 
 rate_shed = dead_count/num_sims
 
