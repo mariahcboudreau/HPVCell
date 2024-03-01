@@ -13,7 +13,7 @@ import csv
 ####
 
 
-num_sims = 100000
+num_sims = 10000
 tmax = 500
 dt=100
 
@@ -22,46 +22,20 @@ dt=100
 # Opening simulated predictions
 ######
 
-with open('extinction_times_02-22_time500_sims5000.npy', 'rb') as f:
+with open('extinction_times_03-01_time500_sims10000.npy', 'rb') as f:
     extinction_times = np.load(f)
 
-
-# with open('all_times_02-22_time500_sims5000.csv', 'r') as read_obj:
-#     csv_reader = csv.reader(read_obj)
-#     all_times = list(csv_reader)
-#     all_times = [list(map(float, sublist)) for sublist in all_times]
-
-# with open('all_history_02-22_time500_sims5000.csv', 'r') as read_obj:
-#     csv_reader = csv.reader(read_obj)
-#     all_history = list(csv_reader)
-#     all_history = [list(map(float, sublist)) for sublist in all_history]
-
-# with open('all_basal_history_02-22_time500_sims5000.csv', 'r') as read_obj:
-#     csv_reader = csv.reader(read_obj)
-#     all_basal_history = list(csv_reader)
-#     all_basal_history = [list(map(float, sublist)) for sublist in all_basal_history]
-
-# with open('all_parabasal_history_02-22_time500_sims5000.csv', 'r') as read_obj:
-#     csv_reader = csv.reader(read_obj)
-#     all_parabasal_history = list(csv_reader)
-#     all_parabasal_history = [list(map(float, sublist)) for sublist in all_parabasal_history]
-
-# with open('shed_times_history_02-22_time500_sims5000.csv', 'r') as read_obj:
-#     csv_reader = csv.reader(read_obj)
-#     shed_times_history = list(csv_reader)
-#     shed_times_history = [list(map(float, sublist)) for sublist in shed_times_history]
-
-# with open('all_shed_times_02-22_time500_sims5000.npy', 'rb') as read_obj:
-#     all_shed_times = np.load(read_obj)
-
-with open('otherbasal_history_02-23_time500_sims100000.npy', 'rb') as f:
+with open('otherbasal_history_03-01_time500_sims10000.npy', 'rb') as f:
     basal_history_other = np.load(f) 
 
-with open('otherparabasal_history_02-23_time500_sims100000.npy', 'rb') as f:
+with open('otherparabasal_history_03-01_time500_sims10000.npy', 'rb') as f:
     parabasal_history_other = np.load(f)
 
-with open('otherdead_history_02-23_time500_sims100000.npy', 'rb') as f:
+with open('otherdead_history_03-01_time500_sims10000.npy', 'rb') as f:
     dead_count = np.load(f)
+
+with open("otherparabasal_variable_03-01_time500_sims10000.npy", 'rb') as f:
+    parabasal_variable = np.load(f)
 
 
 ######
@@ -77,15 +51,28 @@ with open('extinction_mom_b_2layer_geometric_02-23_time500.npy', 'rb') as handle
 with open('shed_first_moments_delta_02-23_time500.npy', 'rb') as f:
     shed_first_moment_delta = np.load(f)
 
+
 # with open('para_first_moments_geom_1-15_500.npy', 'rb') as f:
 #     para_first_moment = np.load(f)
 
-with open('basal_first_moment_geom_1-29_500.npy', 'rb') as f:
-    basal_first_moment= np.load(f)
+# with open('basal_first_moment_geom_1-29_500.npy', 'rb') as f:
+#     basal_first_moment= np.load(f)
 
-with open('para_first_moment_geom_1-29_500.npy', 'rb') as f:
-    para_first_moment = np.load(f)
+# with open('para_first_moment_geom_1-29_500.npy', 'rb') as f:
+#     para_first_moment = np.load(f)
+# with open('para_second_moment_geom_02-29_time500.npy', 'rb') as f:
+#     para_second_moment = np.load(f)
 
+with open('extinction_mom_b_3layer_geometric_03-01_time500.npy', 'rb') as f:
+    extinction_mom_b_withdead = np.load(f)
+with open('shed_first_moments_delta_2layerwithdead_03-01_time500.npy', 'rb') as f:
+    shed_first_momentwithdead = np.load(f)
+with open('basal_first_moment_geom_2layerwithdead_03-01_time500.npy', 'rb') as f:
+    basal_first_momentwithdead = np.load(f)
+with open('para_first_moment_geom_2layerwithdead_03-01_time500.npy', 'rb') as f:
+    para_first_momentwithdead = np.load(f)
+with open('para_second_moment_geom_2layerwithdead_03-01_time500.npy', 'rb') as f:
+    para_second_momentwithdead = np.load(f)
 ######
 # Calculating probability of extinction
 ######
@@ -96,6 +83,7 @@ for i in range(0,tmax):
     ext_count[i] = sum(j < i for j in extinction_times)
 
 prob_extinction = ext_count/num_sims
+
 
 ######
 # Calculating the rate of shed
@@ -113,7 +101,7 @@ avg_virions_array = 1000*rate_shed
 
 
 plt.plot(np.arange(0,len(avg_virions_array))/dt, avg_virions_array, marker = '+', linewidth = 2, label = "Simulated - %d simulations" %(num_sims))
-plt.plot(np.linspace(0,tmax,tmax), shed_first_moment_delta, label = "MoM derivation - Delta initial conditions")
+plt.plot(np.linspace(0,tmax,tmax), 1000*shed_first_momentwithdead, label = "MoM derivation - Delta initial conditions")
 # plt.plot(np.linspace(0,tmax,tmax), avg_virions_array + margin_error, c = 'grey')
 # plt.plot(np.linspace(0,tmax,tmax), avg_virions_array - margin_error, c = 'grey', label = "95% CI")
 # for time in range(0,499, 50):
@@ -167,7 +155,7 @@ plt.show()
 
 # plt.plot(x_new, y_new_avg, "-", label = "Linear interp from simulations")
 plt.plot(np.arange(0,len(basal_history_other))/dt, basal_history_other/num_sims, label = "Mid Sim averages")
-plt.plot(np.linspace(0,tmax, num= tmax), basal_first_moment, 'o', label = "MoM estimations")
+plt.plot(np.linspace(0,tmax, num= tmax), basal_first_momentwithdead, label = "MoM estimations - 3 Layer systems")
 plt.legend(loc= 'best')
 plt.xlabel("Time")
 plt.ylabel("Average Basal Cells")
@@ -190,10 +178,23 @@ plt.show()
 
 # plt.plot(x_new, y_new_avg, "-", label = "Linear interp from simulations")
 plt.plot(np.arange(0,len(parabasal_history_other))/dt, parabasal_history_other/num_sims, label = "Mid Sim averages")
-plt.plot(np.linspace(0,tmax, tmax), para_first_moment, 'o', label = "MoM estimations")
+plt.plot(np.linspace(0,tmax, tmax), para_first_momentwithdead, 'o', label = "MoM estimations - 3 Layer system")
 plt.legend(loc= 'best')
 plt.xlabel("Time")
 plt.ylabel("Average Parabasal Cells")
+plt.show()
+plt.close()
+
+variance_mom = para_second_momentwithdead - para_first_momentwithdead**2
+vals = parabasal_variable
+vars = np.var(vals, axis = 0)
+
+plt.plot(np.arange(0,len(vars))/dt, vars, label = "Mid Sim variance")
+plt.plot(np.linspace(0,tmax, tmax), variance_mom, 'o', label = "MoM second moment estimations")
+plt.legend(loc= 'best')
+plt.title("Variance Parabasal Cells over Time")
+plt.xlabel("Time")
+plt.ylabel("Variance Parabasal Cells")
 plt.show()
 plt.close()
 

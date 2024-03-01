@@ -41,7 +41,7 @@ def cell_division(event_queue, skin, cell, beta, gamma, rho, delta, theta, t):
     return event_queue
 
 # Number of simulations to run
-num_sims = 100000
+num_sims = 10000
 all_history = []
 all_basal_history = []
 all_parabasal_history = []
@@ -88,6 +88,7 @@ skin_size = 100000 #
 dt = 100
 tmax = 500
 parabasal_history_other = np.zeros(tmax*dt)
+parabasal_variable = np.zeros((num_sims,tmax*dt))
 basal_history_other = np.zeros(tmax*dt)
 basal_history_other[0] = 1
 dead_history_other = np.zeros(tmax*dt)
@@ -139,6 +140,7 @@ for s in range(num_sims):
         t = time
         while time > next_time and int(round(next_time*dt))<len(parabasal_history_other):
             parabasal_history_other[int(round(next_time*dt))] += parabasals
+            parabasal_variable[s, int(round(next_time*dt))] += parabasals
             basal_history_other[int(round(next_time*dt))] += basals
             dead_history_other[int(round(next_time*dt))] += dead
             next_time += 1/dt
@@ -172,16 +174,17 @@ for s in range(num_sims):
             all_shed_times.append(t)
             sheds.append(t)
             # dead_history.append(dead)
-        active_cells = parabasals + basals
-        history.append(active_cells)
-        basal_history.append(basals)
-        parabasal_history.append(parabasals)
-        times.append(t)
-    all_times.append(times)
-    all_history.append(history)
-    all_basal_history.append(basal_history)
-    all_parabasal_history.append(parabasal_history)
-    shed_times_history.append(sheds)
+        
+    #     active_cells = parabasals + basals
+    #     history.append(active_cells)
+    #     basal_history.append(basals)
+    #     parabasal_history.append(parabasals)
+    #     times.append(t)
+    # all_times.append(times)
+    # all_history.append(history)
+    # all_basal_history.append(basal_history)
+    # all_parabasal_history.append(parabasal_history)
+    # shed_times_history.append(sheds)
         # all_dead.append(dead_history)
         # all_shed_times.append(shed_times)
     try: 
@@ -198,8 +201,8 @@ for s in range(num_sims):
 
 import csv
 
-# with open('extinction_times_02-22_time500_sims1000.txt', 'wb') as f:
-#     np.save(f, extinction_times)
+with open('extinction_times_03-01_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
+    np.save(f, extinction_times)
 
 # with open("all_times_02-22_time500_sims1000.csv", "w") as f:
 #     wr = csv.writer(f)
@@ -224,11 +227,14 @@ import csv
 # with open('all_shed_times_02-22_time500_sims1000.npy', 'wb') as f:
 #     np.save(f,all_shed_times)
 
-with open('otherbasal_history_02-23_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
+with open('otherbasal_history_03-01_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
     np.save(f, basal_history_other)
 
-with open('otherparabasal_history_02-23_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
+with open('otherparabasal_history_03-01_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
     np.save(f, parabasal_history_other)
 
-with open('otherdead_history_02-23_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
+with open('otherdead_history_03-01_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
     np.save(f, dead_history_other)
+
+with open('otherparabasal_variable_03-01_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
+    np.save(f, parabasal_variable)
