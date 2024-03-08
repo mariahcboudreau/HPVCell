@@ -117,7 +117,7 @@ for ti in range(0, len(t_vec)):
     # extinct_mom_b_delta[ti] = (1-((m_path_delta_geo[ti][0]**2)/(m_path_delta_geo[ti][2])))
     
     extinct_mom_b_poisson[ti] = 1 - (m_path_poisson[ti][0]**2)/(m_path_poisson[ti][2] - m_path_poisson[ti][0])  + scipy.stats.poisson.pmf(k = 0, mu = ((m_path_poisson[ti][2])/(m_path_poisson[ti][0])-1))
-    extinct_mom_p_poisson[ti] = 1 - (m_path_poisson[ti][0]**2)/(m_path_poisson[ti][3] - m_path_poisson[ti][1])  + scipy.stats.poisson.pmf(k = 0, mu = ((m_path_poisson[ti][3])/(m_path_poisson[ti][1])-1))
+    extinct_mom_p_poisson[ti] = 1 - (m_path_poisson[ti][1]**2)/(m_path_poisson[ti][3] - m_path_poisson[ti][1])  + scipy.stats.poisson.pmf(k = 0, mu = ((m_path_poisson[ti][3])/(m_path_poisson[ti][1])-1))
     extinct_mom_b_geometric[ti] = 1 - (2*m_path_delta_geo[ti][0]**2) / (m_path_delta_geo[ti][2] + m_path_delta_geo[ti][0] )  + scipy.stats.geom.pmf(k = 0, p = (2/(m_path_delta_geo[ti][0]*m_path_delta_geo[ti][2] + 1)))
     extinct_mom_p_geometric[ti] = 1 - (2*m_path_delta_geo[ti][1]**2) / (m_path_delta_geo[ti][3] + m_path_delta_geo[ti][1] )  + scipy.stats.geom.pmf(k = 0, p = (2/(m_path_delta_geo[ti][1]*m_path_delta_geo[ti][3] + 1)))
     # shed_moments[0][ti] = 1000*theta*m_path_delta_geo[ti][1]
@@ -134,8 +134,13 @@ for ti in range(0, len(t_vec)):
 # plt.vlines(x, 0, geom.pmf(x, p), colors='b', lw=5, alpha=0.5)
 # plt.show()
 
-# with open('extinction_mom_b_2layer_geometric_02-23_time500.npy', 'wb') as f:
-#     np.save(f, extinct_mom_b_geometric)
+from datetime import datetime
+date = datetime.today().strftime('%m-%d-%Y')
+
+with open('extinction_mom_b_2layer_geometric_'+date+'_time500.npy', 'wb') as f:
+    np.save(f, extinct_mom_b_geometric)
+with open('extinction_mom_b_2layer_poisson_'+date+'_time500.npy', 'wb') as f:
+    np.save(f, extinct_mom_b_poisson)
 # with open('shed_first_moments_delta_02-26_time500_thetaalter.npy', 'wb') as f:
 #     np.save(f, m_path_delta_geo[:,5])
 # with open('basal_first_moment_geom_1-29_500.npy', 'wb') as f:
@@ -143,7 +148,7 @@ for ti in range(0, len(t_vec)):
 # with open('para_first_moment_geom_1-29_500.npy', 'wb') as f:
 #     np.save(f, m_path_delta_geo[:,1])
 
-with open('para_second_moment_geom_02-29_time500.npy', 'wb') as f:
+with open('para_second_moment_geom_'+date+'_time500.npy', 'wb') as f:
     np.save(f, m_path_delta_geo[:,3])
 
 # # plt.plot(t_vec, cumu_extinct_poisson, label = 'Cumulative probability of extinction - Explicit basals (Poisson intital conditions)')
