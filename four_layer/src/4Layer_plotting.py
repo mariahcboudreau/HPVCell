@@ -162,7 +162,7 @@ axs[4].set_ylabel("Dead")
 
 axs[0].set_title("Averages of States")
 #plt.show()
-fig.savefig('four_layer/figures/mom-sims/avg_5state_plot-sims'+str(num_sims)+'-time500_'+date+'.pdf', format = 'pdf')
+#fig.savefig('four_layer/figures/mom-sims/avg_5state_plot-sims'+str(num_sims)+'-time500_'+date+'.pdf', format = 'pdf')
 plt.close()
 ############################### VARIANCE PARABASAL HISTORY ###########################################
 

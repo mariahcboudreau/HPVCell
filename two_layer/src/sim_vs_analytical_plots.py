@@ -147,17 +147,26 @@ CB_color_cycle = ['#377eb8', '#ff7f00', '#4daf4a',
 
 
 ############################### PROBABILITY OF EXTINCTION ###########################################
+import matplotlib.patches as mpatches
+from matplotlib.lines import Line2D
 
+fig, (ax1, ax2) = plt.subplots(2, sharex=True)
 
+ax1.plot(np.arange(0,len(two_extincts)-1)/10, two_extincts[:-1]/num_sims, c = CB_color_cycle[0], ls = 'dashed', linewidth = 3, label= "Simulated Three-agent")
+ax1.plot(np.linspace(0, tmax, tmax), two_extinction_mom_b_withdead, c = CB_color_cycle[0], linewidth = 2, label = 'Method of Moments Three-agent')
+ax2.plot(np.arange(0,len(four_extincts)-1)/dt, four_extincts[:-1]/num_sims, c = CB_color_cycle[4], ls = 'dashed', linewidth = 3, label= "Simulated Five-agent")
+ax2.plot(np.linspace(0, tmax, tmax), four_extinction_mom_b_withdead, c = CB_color_cycle[4], linewidth = 2, label = 'Method of Moments Five-agent')
+ax2.set_xlabel('Time')
+ax2.set_ylabel('Probability')
+ax1.set_ylabel('Probability')
 
-plt.plot(np.arange(0,len(two_extincts)-1)/dt, two_extincts[:-1]/num_sims, c = CB_color_cycle[0], ls = 'dashdot', linewidth = 3, label= "Simulated Three-agent - %d simulations" %(num_sims))
-plt.plot(np.linspace(0, tmax, tmax), two_extinction_mom_b_withdead, c = CB_color_cycle[4], linewidth = 2, label = 'Method of Moments Three-agent')
-plt.plot(np.arange(0,len(four_extincts)-1)/dt, four_extincts[:-1]/num_sims, c = CB_color_cycle[0], ls = 'dashdot', linewidth = 3, label= "Simulated Five-agent - %d simulations" %(num_sims))
-plt.plot(np.linspace(0, tmax, tmax), four_extinction_mom_b_withdead, c = CB_color_cycle[4], linewidth = 2, label = 'Method of Moments Five-agent')
-plt.title("Probability of Extinction of Infected Basal Cells")
-plt.xlabel('Time')
-plt.ylabel('Probability')
-plt.legend()
+# three_patch = mpatches.Patch(color=CB_color_cycle[0], label='Three-agent')
+# five_patch = mpatches.Patch(color=CB_color_cycle[4], label='Five-agent')
+mom_line = Line2D([0], [0], color="black", linewidth=3, linestyle='dashed', label = "Method of moments") 
+sim_line = Line2D([0], [0], color="black", linewidth=2, label = "Simulations") 
+plt.legend(handles=[sim_line, mom_line])
+ax1.set_title("Three-agent")
+ax2.set_title("Five-agent")
 plt.show()
 #plt.savefig('figures/mom-sims/prob_of_extinction_plot-sims'+str(num_sims)+'-time500_'+date+'.pdf', format = 'pdf')
 plt.close()
@@ -193,6 +202,53 @@ ax3.set_ylabel("Dead")
 ax1.set_title("Averages of Agents")
 #fig.savefig('figures/mom-sims/avg_basal_and_parabasal_dead_plot-sims'+str(num_sims)+'-time500_'+date+'.pdf', format = 'pdf')
 # fig.close()
+
+
+############################### AVERAGE BASAL HISTORY - FOUR ###########################################
+date = datetime.today().strftime('%m-%d-%Y')
+
+fig, axs = plt.subplots(5, sharex=True)
+
+axs[0].plot(np.arange(0,len(four_basal_history_other)-1)/dt, four_basal_history_other[1:]/num_sims, c = CB_color_cycle[0], ls = 'dotted', linewidth = 3, label = "Simulated - %d simulations" %(num_sims))
+axs[0].plot(np.linspace(0,tmax, num= tmax), four_basal_first_momentwithdead, c = CB_color_cycle[4], linewidth = 2, label = "Method of Moments")
+axs[0].legend(loc= 'best')
+axs[0].set_ylabel("Basal")
+
+############################### AVERAGE PARABASAL HISTORY ###########################################
+
+
+axs[1].plot(np.arange(0,len(four_parabasal_history_other))/dt, four_parabasal_history_other/num_sims, c = CB_color_cycle[0], ls = 'dotted', linewidth = 3, label = "Simulated - %d simulations" %(num_sims))
+axs[1].plot(np.linspace(0,tmax, tmax), four_para_first_momentwithdead, c = CB_color_cycle[4], linewidth = 2, label = "Method of Moments")
+axs[1].set_ylabel("Parabasal")
+
+############################### AVERAGE INTERMEDIATE HISTORY ###########################################
+
+
+axs[2].plot(np.arange(0,len(four_intermed_history))/dt, four_intermed_history/num_sims, c = CB_color_cycle[0], ls = 'dotted', linewidth = 3, label = "Simulated - %d simulations" %(num_sims))
+axs[2].plot(np.linspace(0,tmax, tmax), four_intermed_first_momentwithdead, c = CB_color_cycle[4], linewidth = 2, label = "Method of Moments")
+axs[2].set_ylabel("Intermediate")
+
+############################### AVERAGE SUPER HISTORY ###########################################
+
+
+axs[3].plot(np.arange(0,len(four_super_history))/dt, four_super_history/num_sims, c = CB_color_cycle[0], ls = 'dotted', linewidth = 3, label = "Simulated - %d simulations" %(num_sims))
+axs[3].plot(np.linspace(0,tmax, tmax),four_super_first_momentwithdead, c = CB_color_cycle[4], linewidth = 2, label = "Method of Moments")
+axs[3].set_ylabel("Super")
+
+
+############################### AVERAGE DEAD HISTORY ###########################################
+
+
+axs[4].plot(np.arange(0,len(four_dead_count))/dt, four_dead_count/num_sims, c = CB_color_cycle[0], ls = 'dotted', linewidth = 3, label = "Simulated - %d simulations" %(num_sims))
+axs[4].plot(np.linspace(0,tmax, tmax), four_shed_first_momentwithdead, c = CB_color_cycle[4], linewidth = 2, label = "Method of Moments")
+plt.xlabel("Time")
+axs[4].set_ylabel("Dead")
+
+axs[0].set_title("Averages of Agents")
+#plt.show()
+#fig.savefig('four_layer/figures/mom-sims/avg_5state_plot-sims'+str(num_sims)+'-time500_'+date+'.pdf', format = 'pdf')
+plt.close()
+
 ############################### VARIANCE PARABASAL HISTORY ###########################################
 
 
@@ -212,8 +268,10 @@ ax1.set_title("Averages of Agents")
 
 ############################### AVERAGE VIRIONS ################################################
 
-plt.plot(np.arange(0,len(two_dead_count))/dt, 1000*two_dead_count/num_sims, c = CB_color_cycle[0], ls = 'dashdot', linewidth = 3, label= "Simulated - %d simulations" %(num_sims))
+plt.plot(np.arange(0,len(two_dead_count))/dt, 1000*two_dead_count/num_sims, c = CB_color_cycle[0], ls = 'dashed', linewidth = 3, label= "Simulated - %d simulations" %(num_sims))
 plt.plot(np.linspace(0, tmax, tmax), 1000*two_shed_first_momentwithdead, c = CB_color_cycle[4], linewidth = 2, label = 'Method of Moments')
+plt.plot(np.arange(0,len(four_dead_count))/dt, 1000*four_dead_count/num_sims, c = CB_color_cycle[0], ls = 'dashdot', linewidth = 3, label= "Simulated - %d simulations" %(num_sims))
+plt.plot(np.linspace(0, tmax, tmax), 1000*four_shed_first_momentwithdead, c = CB_color_cycle[4], linewidth = 2, label = 'Method of Moments')
 plt.title('Average Virions over Time')
 plt.xlabel('Time')
 plt.ylabel('Average Virons')
@@ -237,7 +295,7 @@ for ti in range(0, tmax):
     mom_nonextincts[ti] = 1/p
 
 
-plt.plot(np.arange(0,len(total_non_extincts)-1)/dt, total_non_extincts[1:], c = CB_color_cycle[0], ls = 'dotted', linewidth = 3, label = "Simulated - %d simulations" %(num_sims))
+plt.plot(np.arange(0,len(total_non_extincts)-1)/dt, total_non_extincts[1:], c = CB_color_cycle[0], ls = 'dashed', linewidth = 3, label = "Simulated - %d simulations" %(num_sims))
 plt.plot(np.linspace(0,tmax-1, num = tmax-1), mom_nonextincts[1:], c = CB_color_cycle[4], linewidth = 2, label = "Method of Moments")
 #plt.fill_between(np.arange(0,len(total_non_extincts_100)-1)/10, total_non_extincts_100[1:]+ var_total_non_extincts_100[1:], total_non_extincts_100[1:], alpha = 0.5)
 plt.legend(loc= 'best')
