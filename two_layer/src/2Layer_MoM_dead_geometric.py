@@ -65,8 +65,8 @@ def MOM(m, t, beta, gamma, delta, rho, theta):
 
 
 # Max Time
-t_length = 500
-t_steps = 500
+t_length = 6000
+t_steps = 6000
 t_vec = np.linspace(0, t_length, t_steps)
 
 # Initial conditions
@@ -132,21 +132,20 @@ for ti in range(0, len(t_vec)):
 
 ############################## SAVING FILES #######################################
 
-import os
-os.chdir('two_layer/src')
+
 # with open('data/extinction_mom_b_2layerdead_poisson_'+date+'_time500.npy', 'wb') as f:
 #     np.save(f, extinct_mom_b_poisson)
-with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCellSim/two_layer/data/extinction_mom_b_2layerdead_geometric_'+date+'_time500.npy', 'wb') as f:
+with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/two_layer/data/extinction_mom_b_2layerdead_geometric_'+date+'_time%d.npy'%(t_length), 'wb') as f:
     np.save(f, extinct_mom_b_geometric)
-with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCellSim/two_layer/data/shed_first_moments_delta_2layerwithdead_'+date+'_time500.npy', 'wb') as f:
+with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/two_layer/data/shed_first_moments_delta_2layerwithdead_'+date+'_time%d.npy'%(t_length), 'wb') as f:
     np.save(f, m_path_delta_geo[:,2])
-with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCellSim/two_layer/data/basal_first_moment_geom_2layerwithdead_'+date+'_time500.npy', 'wb') as f:
+with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/two_layer/data/basal_first_moment_geom_2layerwithdead_'+date+'_time%d.npy'%(t_length), 'wb') as f:
     np.save(f, m_path_delta_geo[:,0])
-with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCellSim/two_layer/data/para_first_moment_geom_2layerwithdead_'+date+'_time500.npy', 'wb') as f:
+with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/two_layer/data/para_first_moment_geom_2layerwithdead_'+date+'_time%d.npy'%(t_length), 'wb') as f:
     np.save(f, m_path_delta_geo[:,1])
-with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCellSim/two_layer/data/para_second_moment_geom_2layerwithdead_'+date+'_time500.npy', 'wb') as f:
-    np.save(f, m_path_delta_geo[:,4])
-with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCellSim/two_layer/data/basal_second_moment_geom_2layerwithdead_'+date+'_time500.npy', 'wb') as f:
+# with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/two_layer/data/para_second_moment_geom_2layerwithdead_'+date+'_time500.npy', 'wb') as f:
+#     np.save(f, m_path_delta_geo[:,4])
+with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/two_layer/data/basal_second_moment_geom_2layerwithdead_'+date+'_time%d.npy'%(t_length), 'wb') as f:
     np.save(f, m_path_delta_geo[:,3])
 
 
