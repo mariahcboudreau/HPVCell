@@ -120,8 +120,8 @@ def MOM(m, t, beta, gamma, delta, rho, alpha, sigma, theta):
 
 
 # Max Time
-t_length = 6000
-t_steps = 6000
+t_length = 750
+t_steps = 750
 t_vec = np.linspace(0, t_length, t_steps)
 
 # Initial conditions
@@ -190,6 +190,9 @@ with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/four_layer/data/exti
 
 with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/four_layer/data/shed_first_moments_delta_4layerwithdead_'+date+'_time%d.npy'%(t_length), 'wb') as f:
     np.save(f, m_path_delta_geo[:,4])
+
+with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/four_layer/data/shed_second_moments_delta_4layerwithdead_'+date+'_time%d.npy'%(t_length), 'wb') as f:
+    np.save(f, m_path_delta_geo[:,9])
 
 with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/four_layer/data/basal_first_moment_geom_4layerwithdead_'+date+'_time%d.npy'%(t_length), 'wb') as f:
     np.save(f, m_path_delta_geo[:,0])

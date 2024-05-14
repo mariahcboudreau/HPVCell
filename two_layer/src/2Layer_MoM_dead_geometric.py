@@ -65,8 +65,8 @@ def MOM(m, t, beta, gamma, delta, rho, theta):
 
 
 # Max Time
-t_length = 6000
-t_steps = 6000
+t_length = 750
+t_steps = 750
 t_vec = np.linspace(0, t_length, t_steps)
 
 # Initial conditions
@@ -137,7 +137,7 @@ for ti in range(0, len(t_vec)):
 #     np.save(f, extinct_mom_b_poisson)
 with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/two_layer/data/extinction_mom_b_2layerdead_geometric_'+date+'_time%d.npy'%(t_length), 'wb') as f:
     np.save(f, extinct_mom_b_geometric)
-with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/two_layer/data/shed_first_moments_delta_2layerwithdead_'+date+'_time%d.npy'%(t_length), 'wb') as f:
+with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/two_layer/data/shed_first_moments_geom_2layerwithdead_'+date+'_time%d.npy'%(t_length), 'wb') as f:
     np.save(f, m_path_delta_geo[:,2])
 with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/two_layer/data/basal_first_moment_geom_2layerwithdead_'+date+'_time%d.npy'%(t_length), 'wb') as f:
     np.save(f, m_path_delta_geo[:,0])
@@ -147,7 +147,8 @@ with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/two_layer/data/para_
 #     np.save(f, m_path_delta_geo[:,4])
 with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/two_layer/data/basal_second_moment_geom_2layerwithdead_'+date+'_time%d.npy'%(t_length), 'wb') as f:
     np.save(f, m_path_delta_geo[:,3])
-
+with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/two_layer/data/shed_second_moments_geom_2layerwithdead_'+date+'_time%d.npy'%(t_length), 'wb') as f:
+    np.save(f, m_path_delta_geo[:,5])
 
 
 # with open('extinct_mom_b_2layer_main_geometric_1_8_500.npy', 'wb') as handle:    

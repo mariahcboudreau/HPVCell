@@ -66,7 +66,7 @@ def cell_division(event_queue, skin, cell, beta, gamma, rho, delta, theta, t):
 num_sims = 50000
 
 # Next time differential
-dt = 100
+dt = 10
 
 # Max time for the simulation to run
 tmax = 750
@@ -146,11 +146,11 @@ for s in range(num_sims):
             t = time
          # Assign new values to the 
         while t > next_time and int(round(next_time*dt))<len(parabasal_history_other):
-            parabasal_history_other[int(round(next_time*dt))] += parabasals
-            # parabasal_variable[s, int(round(next_time*dt))] += parabasals
-            basal_history_other[int(round(next_time*dt))] += basals
-            basal_history_nonextinct[s, int(round(next_time*dt))] += basals
-            dead_history_other[int(round(next_time*dt))] += dead
+            # parabasal_history_other[int(round(next_time*dt))] += parabasals
+            # # parabasal_variable[s, int(round(next_time*dt))] += parabasals
+            # basal_history_other[int(round(next_time*dt))] += basals
+            # basal_history_nonextinct[s, int(round(next_time*dt))] += basals
+            # dead_history_other[int(round(next_time*dt))] += dead
             dead_history_all[s, int(round(next_time*dt))] += dead
             
             # Track the extinction events
@@ -261,14 +261,27 @@ for s in range(num_sims):
 # with open('/Users/mcboudre/OneDrive - University of Vermont/HPV-Data/two_layer_data/otherparabasal_history_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
 #     np.save(f, parabasal_history_other)
 
-# with open('/Users/mcboudre/OneDrive - University of Vermont/HPV-Data/two_layer_data/basal_history_nonextinct_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
-#     np.save(f, basal_history_nonextinct)
+basal_history_nonextinct[basal_history_nonextinct == 0] = np.nan
+two_total_non_extincts = np.nanmean(basal_history_nonextinct, axis = 0)
+
+two_dead_history_nonextinct = np.delete(dead_history_all, extinct_sims, axis = 0)
+
+with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/two_layer/data/basal_history_nonextinct_mean_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
+    np.save(f, two_total_non_extincts)
 
 # with open('/Users/mcboudre/OneDrive - University of Vermont/HPV-Data/two_layer_data/otherdead_history_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
 #     np.save(f, dead_history_other)
 
-with open('/Users/mcboudre/OneDrive - University of Vermont/HPV-Data/two_layer_data/dead_history_all_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
-    np.save(f, dead_history_all)
+with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/four_layer/data/two_dead_history_nonextinct_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
+    np.save(f, two_dead_history_nonextinct)
+
+with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/four_layer/data/two_dead_history_nonextinct_mean_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
+    np.save(f, two_dead_history_nonextinct.mean(axis = 0))
+
+with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/four_layer/data/two_dead_history_nonextinct_variance_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
+    np.save(f, two_dead_history_nonextinct.var(axis = 0))
+
+
 
 # with open('otherparabasal_variable_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
 #     np.save(f, parabasal_variable)
