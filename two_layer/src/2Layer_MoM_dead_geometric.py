@@ -60,7 +60,7 @@ def MOM(m, t, beta, gamma, delta, rho, theta):
     # Covariance for pd
     dx[7] = (rho - theta) * m[7] + theta * m[4] - theta * m[1] + (gamma + 2*delta) * m[8]
     # Covariance for bd
-    dx[8] = beta * m[0] + theta * m[6] - delta * m[8]
+    dx[8] = beta * m[8] + theta * m[6] - delta * m[8]
     return dx
 
 
@@ -143,8 +143,8 @@ with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/two_layer/data/basal
     np.save(f, m_path_delta_geo[:,0])
 with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/two_layer/data/para_first_moment_geom_2layerwithdead_'+date+'_time%d.npy'%(t_length), 'wb') as f:
     np.save(f, m_path_delta_geo[:,1])
-# with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/two_layer/data/para_second_moment_geom_2layerwithdead_'+date+'_time500.npy', 'wb') as f:
-#     np.save(f, m_path_delta_geo[:,4])
+with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/two_layer/data/para_second_moment_geom_2layerwithdead_'+date+'_time%d.npy', 'wb') as f:
+    np.save(f, m_path_delta_geo[:,4])
 with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/two_layer/data/basal_second_moment_geom_2layerwithdead_'+date+'_time%d.npy'%(t_length), 'wb') as f:
     np.save(f, m_path_delta_geo[:,3])
 with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/two_layer/data/shed_second_moments_geom_2layerwithdead_'+date+'_time%d.npy'%(t_length), 'wb') as f:

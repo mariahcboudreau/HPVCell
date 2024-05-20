@@ -84,14 +84,14 @@ tmax = 750
 
 
 
-parabasal_history_other = np.zeros(tmax*dt)
-parabasal_variable = np.zeros((num_sims,tmax*dt))
-basal_history_other = np.zeros(tmax*dt)
-basal_history_other[0] = num_sims
+parabasal_history_other = np.zeros((num_sims,tmax*dt))
+# parabasal_variable = np.zeros((num_sims,tmax*dt))
+basal_history_other = np.zeros((num_sims,tmax*dt))
+# basal_history_other[0] = num_sims
 basal_history_nonextinct = np.zeros((num_sims,tmax*dt))
-inter_history_other = np.zeros(tmax*dt)
-super_history_other = np.zeros(tmax*dt)
-dead_history_other = np.zeros(tmax*dt)
+inter_history_other = np.zeros((num_sims,tmax*dt))
+super_history_other = np.zeros((num_sims,tmax*dt))
+# dead_history_other = np.zeros(tmax*dt)
 dead_history_all = np.zeros((num_sims,tmax*dt))
 extincts = np.zeros(tmax*dt)
 extinct_sims = []
@@ -152,13 +152,13 @@ for s in range(num_sims):
             (time, cell, event) = heapq.heappop(event_queue)
             t = time
          # Assign new values to the 
-        while t > next_time and int(round(next_time*dt))<len(parabasal_history_other):
-            # parabasal_history_other[int(round(next_time*dt))] += parabasals
+        while t > next_time and int(round(next_time*dt))<parabasal_history_other.shape[1]:
+            parabasal_history_other[s, int(round(next_time*dt))] += parabasals
             # # parabasal_variable[s, int(round(next_time*dt))] += parabasals
-            # basal_history_other[int(round(next_time*dt))] += basals
-            # basal_history_nonextinct[s,int(round(next_time*dt))] += basals
-            # inter_history_other[int(round(next_time*dt))] += intermeds
-            # super_history_other[int(round(next_time*dt))] += supers
+            basal_history_other[s, int(round(next_time*dt))] += basals
+            basal_history_nonextinct[s,int(round(next_time*dt))] += basals
+            inter_history_other[s, int(round(next_time*dt))] += intermeds
+            super_history_other[s, int(round(next_time*dt))] += supers
             # dead_history_other[int(round(next_time*dt))] += dead
             dead_history_all[s, int(round(next_time*dt))] += dead
             
@@ -248,7 +248,8 @@ for s in range(num_sims):
             
         
   
-
+basal_history_nonextinct[basal_history_nonextinct == 0] = np.nan
+four_total_non_extincts = np.nanmean(basal_history_nonextinct, axis = 0)
 
 
 ############################## SAVING FILES #######################################
@@ -256,55 +257,69 @@ for s in range(num_sims):
 
 
 
-# with open('/Users/mcboudre/OneDrive - University of Vermont/HPV-Data/four_layer_data/otherbasal_history_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
-#     np.save(f, basal_history_other)
+with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/four_layer/data/four_basal_history_mean_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
+    np.save(f, basal_history_other.mean(axis = 0))
 
-# with open('/Users/mcboudre/OneDrive - University of Vermont/HPV-Data/four_layer_data/otherbasal_history_nonextinct_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
-#     np.save(f, basal_history_nonextinct)
+with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/four_layer/data/four_basal_history_var_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
+    np.save(f, basal_history_other.var(axis = 0))
 
-# with open('/Users/mcboudre/OneDrive - University of Vermont/HPV-Data/four_layer_data/otherparabasal_history_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
-#     np.save(f, parabasal_history_other)
+with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/four_layer/data/four_basal_history_nonextinct_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
+    np.save(f, four_total_non_extincts)
 
-# with open('/Users/mcboudre/OneDrive - University of Vermont/HPV-Data/four_layer_data/intermed_history_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
-#     np.save(f, inter_history_other)
+with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/four_layer/data/four_parabasal_history_mean_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
+    np.save(f, parabasal_history_other.mean(axis = 0))
 
-# with open('/Users/mcboudre/OneDrive - University of Vermont/HPV-Data/four_layer_data/super_history_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
-#     np.save(f, super_history_other)
+with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/four_layer/data/four_parabasal_history_var_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
+    np.save(f, parabasal_history_other.var(axis = 0))
 
-# with open('/Users/mcboudre/OneDrive - University of Vermont/HPV-Data/four_layer_data/otherdead_history_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
-#     np.save(f, dead_history_other)
+with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/four_layer/data/four_intermed_history_mean_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
+    np.save(f, inter_history_other.mean(axis = 0))
 
-basal_history_nonextinct[basal_history_nonextinct == 0] = np.nan
-four_total_non_extincts = np.nanmean(basal_history_nonextinct, axis = 0)
+with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/four_layer/data/four_intermed_history_var_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
+    np.save(f, inter_history_other.var(axis = 0))
 
-four_dead_history_nonextinct = np.delete(dead_history_all, extinct_sims, axis = 0)
+with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/four_layer/data/four_super_history_mean_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
+    np.save(f, super_history_other.mean(axis= 0))
+
+with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/four_layer/data/four_super_history_var_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
+    np.save(f, super_history_other.var(axis= 0))
+
+with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/four_layer/data/four_dead_history_mean_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
+    np.save(f, dead_history_all.mean(axis=0))
+
+with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/four_layer/data/four_dead_history_var_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
+    np.save(f, dead_history_all.var(axis=0))
+
+
+
+# four_dead_history_nonextinct = np.delete(dead_history_all, extinct_sims, axis = 0)
 
 
 
 
-with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/four_layer/data/four_dead_history_nonextinct_mean_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
-    np.save(f, four_dead_history_nonextinct.mean(axis = 0))
-with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/four_layer/data/four_dead_history_nonextinct_variance_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
-    np.save(f, four_dead_history_nonextinct.var(axis = 0))
+# with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/four_layer/data/four_dead_history_nonextinct_mean_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
+#     np.save(f, four_dead_history_nonextinct.mean(axis = 0))
+# with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/four_layer/data/four_dead_history_nonextinct_variance_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
+#     np.save(f, four_dead_history_nonextinct.var(axis = 0))
 
 with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/four_layer/data/total_nonextincts_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
     np.save(f, four_total_non_extincts)
 
-with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/four_layer/data/two_dead_history_nonextinct_05-13-2024_time%d_sims%d.npy'%(tmax, num_sims), 'rb') as f:
-    two_dead_history_nonextinct = np.load(f)
+# with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/four_layer/data/two_dead_history_nonextinct_05-13-2024_time%d_sims%d.npy'%(tmax, num_sims), 'rb') as f:
+#     two_dead_history_nonextinct = np.load(f)
 
 
-dead_history_diff_mean = (four_dead_hist_nonextinct_trunc-two_dead_history_nonextinct).mean(axis = 0)
+# dead_history_diff_mean = (four_dead_hist_nonextinct_trunc-two_dead_history_nonextinct).mean(axis = 0)
 
-dead_history_diff_variance = (four_dead_hist_nonextinct_trunc-two_dead_history_nonextinct).var(axis = 0)
+# dead_history_diff_variance = (four_dead_hist_nonextinct_trunc-two_dead_history_nonextinct).var(axis = 0)
 
 
 
-with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/four_layer/data/diff_dead_history_mean_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
-    np.save(f, dead_history_diff_mean)
+# with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/four_layer/data/diff_dead_history_mean_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
+#     np.save(f, dead_history_diff_mean)
 
-with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/four_layer/data/diff_dead_history_variance_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
-    np.save(f, dead_history_diff_variance)
+# with open('/Users/mcboudre/Documents/MOCS2/testCode/HPVCell/four_layer/data/diff_dead_history_variance_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
+#     np.save(f, dead_history_diff_variance)
 
 # with open('otherparabasal_variable_'+date+'_time%d_sims%d.npy'%(tmax, num_sims), 'wb') as f:
 #     np.save(f, parabasal_variable)
